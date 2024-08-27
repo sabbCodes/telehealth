@@ -34,10 +34,8 @@ function DoctorSignUp() {
     });
     const router = useRouter();
     const searchParams = useSearchParams();
-    const role = searchParams.get('role') || 'doctor';
 
     const { publicKey, connected } = useWallet();
-    console.log(publicKey?.toString(), connected);
 
     useEffect(() => {
         if (connected && publicKey) {
@@ -49,6 +47,7 @@ function DoctorSignUp() {
     }, [connected, publicKey]);
 
     useEffect(() => {
+        const role = searchParams.get('role') || 'doctor';
         if (role !== 'doctor') {
             router.push('/');
         }
