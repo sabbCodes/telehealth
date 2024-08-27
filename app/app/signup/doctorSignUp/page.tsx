@@ -51,7 +51,7 @@ function DoctorSignUp() {
         if (role !== 'doctor') {
             router.push('/');
         }
-    }, []);
+    }, [searchParams, router]);
 
     const handleNext = () => {
         if (currentPage === 1) {
