@@ -34,6 +34,7 @@ function DoctorSignUp() {
     });
     const router = useRouter();
     const searchParams = useSearchParams();
+    const role = searchParams.get('role') || 'doctor';
 
     const { publicKey, connected } = useWallet();
 
@@ -47,11 +48,10 @@ function DoctorSignUp() {
     }, [connected, publicKey]);
 
     useEffect(() => {
-        const role = searchParams.get('role') || 'doctor';
         if (role !== 'doctor') {
             router.push('/');
         }
-    }, [searchParams, router]);
+    }, []);
 
     const handleNext = () => {
         if (currentPage === 1) {
