@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { auth, db } from '../../components/firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
@@ -45,13 +45,13 @@ function DoctorSignUp() {
         }
     }, [connected, publicKey]);
 
-    useEffect(() => {
-        const searchParams = useSearchParams();
-        const role = searchParams.get('role') || 'doctor';
-        if (role !== 'doctor') {
-            router.push('/');
-        }
-    }, []);
+    // useEffect(() => {
+    //     const searchParams = useSearchParams();
+    //     const role = searchParams.get('role') || 'doctor';
+    //     if (role !== 'doctor') {
+    //         router.push('/');
+    //     }
+    // }, []);
 
     const handleNext = () => {
         if (currentPage === 1) {
