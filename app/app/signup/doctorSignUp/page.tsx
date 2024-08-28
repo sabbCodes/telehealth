@@ -33,8 +33,6 @@ function DoctorSignUp() {
         walletAddress: ''
     });
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const role = searchParams.get('role') || 'doctor';
 
     const { publicKey, connected } = useWallet();
 
@@ -48,6 +46,8 @@ function DoctorSignUp() {
     }, [connected, publicKey]);
 
     useEffect(() => {
+        const searchParams = useSearchParams();
+        const role = searchParams.get('role') || 'doctor';
         if (role !== 'doctor') {
             router.push('/');
         }
