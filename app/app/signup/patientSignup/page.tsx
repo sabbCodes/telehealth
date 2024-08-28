@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { auth, db } from '../../components/firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
@@ -50,6 +50,8 @@ function PatientSignUp() {
         walletAddress: '',
     });
     const router = useRouter();
+    // const searchParams = useSearchParams();
+    // const role = searchParams.get('role') || 'patient';
 
     const { publicKey, connected } = useWallet();
     console.log(publicKey?.toString(), connected);
@@ -63,13 +65,11 @@ function PatientSignUp() {
         }
     }, [connected, publicKey]);
 
-    useEffect(() => {
-        const searchParams = useSearchParams();
-        const role = searchParams.get('role') || 'patient';
-        if (role !== 'patient') {
-            router.push('/');
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (role !== 'patient') {
+    //         router.push('/');
+    //     }
+    // }, []);
 
     const handleNext = () => {
         if (currentPage === 1) {
