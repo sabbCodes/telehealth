@@ -177,7 +177,7 @@ function DocDetails() {
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
             <div className='my-2 flex justify-center relative'>
-                <Link href='/userHome/alldoctors' className='absolute left-0 top-2'>
+                <Link href='/userHome' className='absolute left-0 top-2'>
                     <Image src={ArrowLeft} alt='back icon' />
                 </Link>
                 <div className='flex flex-col items-center p-2'>

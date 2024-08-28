@@ -50,8 +50,6 @@ function PatientSignUp() {
         walletAddress: '',
     });
     const router = useRouter();
-    // const searchParams = useSearchParams();
-    // const role = searchParams.get('role') || 'patient';
 
     const { publicKey, connected } = useWallet();
     console.log(publicKey?.toString(), connected);
@@ -64,12 +62,6 @@ function PatientSignUp() {
             }));
         }
     }, [connected, publicKey]);
-
-    // useEffect(() => {
-    //     if (role !== 'patient') {
-    //         router.push('/');
-    //     }
-    // }, []);
 
     const handleNext = () => {
         if (currentPage === 1) {
