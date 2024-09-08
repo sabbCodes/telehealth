@@ -19,15 +19,19 @@
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.95.3",
+    "@stablelib/base64": "^2.0.0",
+    "@stablelib/utf8": "^2.0.0",
     "@tanstack/react-query": "^5.40.0",
     "@tanstack/react-query-next-experimental": "5.40.0",
+    "buffer": "^6.0.3",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.5",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^20",

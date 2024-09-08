@@ -100,16 +100,16 @@ function Schedule() {
             </div>
             <footer className='flex items-center h-14 shadow-3xl w-screen m-0 absolute right-0 left-0 bottom-0 bg-white'>
                 <nav className='w-full flex gap-14 justify-evenly items-center py-4 px-14'>
-                    <Link href='/userHome'>
+                    <Link href='/patient/userHome'>
                         <Image src={HomeInactive} alt='home icon' />
                     </Link>
-                    <Link href='/schedule'>
+                    <Link href='/patient/schedule'>
                         <Image src={ScheduleActive} alt='Schedule icon' />
                     </Link>
-                    <Link href='/messages'>
+                    <Link href='/patient/messages'>
                         <Image src={MessagesInactive} alt='Messages icon' />
                     </Link>
-                    <Link href='/userProfile'>
+                    <Link href='/patient/userProfile'>
                         <Image src={ProfileInactive} alt='Profile icon' />
                     </Link>
                 </nav>
