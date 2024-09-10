@@ -193,9 +193,12 @@ export const POST = async (req: Request) => {
 
   const headers = {
     ...ACTIONS_CORS_HEADERS,
-    "X-Action-Version": "1", // Add an appropriate version number
-    "X-Blockchain-Ids": "solana", // Add appropriate blockchain ID(s)
+    "X-Action-Version": "1",
+    "X-Blockchain-Ids": "solana",
   }
 
-  return new Response(JSON.stringify(payload), { headers });
+  return new Response(JSON.stringify(payload), {
+    headers: headers,
+    status: 200
+  });
 };
