@@ -106,14 +106,19 @@ export const GET = async (req: Request) => {
 
   const headers = {
     ...ACTIONS_CORS_HEADERS,
-    "X-Action-Version": "1", // Add an appropriate version number
-    "X-Blockchain-Ids": "solana", // Add appropriate blockchain ID(s)
+    "X-Action-Version": "1",
+    "X-Blockchain-Ids": "solana",
   }
 
   return new Response(JSON.stringify(payload), { headers });
 };
 
-export const OPTIONS = GET;
+export const OPTIONS = async () => {
+  return new Response(null, {
+    headers: ACTIONS_CORS_HEADERS,
+    status: 204
+  });
+};
 
 export const POST = async (req: Request) => {
   const body: ActionPostRequest = await req.json();
@@ -155,7 +160,6 @@ export const POST = async (req: Request) => {
   }
 
   const connection = new Connection(clusterApiUrl("devnet"));
-
   const { blockhash } = await connection.getLatestBlockhash();
 
   const transaction = new Transaction({
