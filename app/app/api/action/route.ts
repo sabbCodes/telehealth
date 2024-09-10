@@ -104,9 +104,13 @@ export const GET = async (req: Request) => {
     }
   };
 
-  return new Response(JSON.stringify(payload), {
-    headers: ACTIONS_CORS_HEADERS,
-  });
+  const headers = {
+    ...ACTIONS_CORS_HEADERS,
+    "X-Action-Version": "1", // Add an appropriate version number
+    "X-Blockchain-Ids": "solana", // Add appropriate blockchain ID(s)
+  }
+
+  return new Response(JSON.stringify(payload), { headers });
 };
 
 export const OPTIONS = GET;
@@ -187,7 +191,11 @@ export const POST = async (req: Request) => {
 
   await addDoc(collection(db, 'bookings'), bookingDetails);
 
-  return new Response(JSON.stringify(payload), {
-    headers: ACTIONS_CORS_HEADERS,
-  });
+  const headers = {
+    ...ACTIONS_CORS_HEADERS,
+    "X-Action-Version": "1", // Add an appropriate version number
+    "X-Blockchain-Ids": "solana", // Add appropriate blockchain ID(s)
+  }
+
+  return new Response(JSON.stringify(payload), { headers });
 };

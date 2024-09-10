@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: "teleHealthSol",
     images: [
       {
-        url: "https://solana.com/_next/static/media/logotype.e4df684f.svg",
+        url: "/teleHealth.jpg",
         width: 800,
         height: 600,
         alt: "teleHealthSol logo",
