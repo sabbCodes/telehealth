@@ -15,7 +15,6 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import HeadImage from "@/public/teleHealth.jpg";
 
 const PLATFORM_ADDRESS: PublicKey = new PublicKey(
   "Sab5y7LG3VefLz4E6DSCkxdmjG4pve3hcAb8NUPKn42",
@@ -33,79 +32,81 @@ const DOCTOR_SABB_FEE = 0.1;
 const DOCTOR_ABDALLAH_FEE = 0.2;
 
 export const GET = async (req: Request) => {
-    const payload: ActionGetResponse = {
-      title: "Schedule a session with your favourite doctors from around the world - with just a single click!",
-      icon: `${HeadImage}`,
-      description: "Book a session with your favorite DOCTOR",
-      label: "Book a session",
-      links: {
-        actions: [
-          {
-            href: req.url+'?date={date}&time={time}&doctor={doctor}',
-            label: "Schedule meeting now!",
-            parameters: [
-              {
-                type: "date",
-                name: "date",
-                label: "Session date",
-                required: true
-              },
-              {
-                type: "select",
-                name: "time",
-                options: [
-                  {
-                    value: "8 AM",
-                    label: "8 AM"
-                  },
-                  {
-                    value: "9 AM",
-                    label: "9 AM"
-                  },
-                  {
-                    value: "10 AM",
-                    label: "10 AM"
-                  },
-                  {
-                    value: "11 AM",
-                    label: "11 AM"
-                  },
-                  {
-                    value: "12 PM",
-                    label: "12 PM"
-                  }
-                ],
-                required: true
-              },
-              {
-                type: "select",
-                name: "doctor",
-                options: [
-                  {
-                    value: "Dr. Abdallah",
-                    label: "Dr. Abdallah"
-                  },
-                  {
-                    value: "Dr. Sabb",
-                    label: "Dr. Sabb"
-                  }
-                ],
-                required: true
-              }
-            ]
-          }
-        ]
-      },
-      type: "action",
-      error: {
-        message: "Please use the wallet which you registered on teleHealthSol!"
-      }
-    };
+  const reqURL = new URL(req.url);
+  const iconUrl = new URL("/teleHealth.jpg", reqURL.origin);
 
-    return new Response(JSON.stringify(payload), {
-      headers: ACTIONS_CORS_HEADERS,
-    });
+  const payload: ActionGetResponse = {
+    title: "Schedule a session with your favourite doctors from around the world - with just a single click!",
+    icon: iconUrl.toString(),
+    description: "Book a session with your favorite DOCTOR",
+    label: "Book a session",
+    links: {
+      actions: [
+        {
+          href: req.url+'?date={date}&time={time}&doctor={doctor}',
+          label: "Schedule meeting now!",
+          parameters: [
+            {
+              type: "date",
+              name: "date",
+              label: "Session date",
+              required: true
+            },
+            {
+              type: "select",
+              name: "time",
+              options: [
+                {
+                  value: "8 AM",
+                  label: "8 AM"
+                },
+                {
+                  value: "9 AM",
+                  label: "9 AM"
+                },
+                {
+                  value: "10 AM",
+                  label: "10 AM"
+                },
+                {
+                  value: "11 AM",
+                  label: "11 AM"
+                },
+                {
+                  value: "12 PM",
+                  label: "12 PM"
+                }
+              ],
+              required: true
+            },
+            {
+              type: "select",
+              name: "doctor",
+              options: [
+                {
+                  value: "Dr. Abdallah",
+                  label: "Dr. Abdallah"
+                },
+                {
+                  value: "Dr. Sabb",
+                  label: "Dr. Sabb"
+                }
+              ],
+              required: true
+            }
+          ]
+        }
+      ]
+    },
+    type: "action",
+    error: {
+      message: "Please use the wallet which you registered on teleHealthSol!"
+    }
+  };
 
+  return new Response(JSON.stringify(payload), {
+    headers: ACTIONS_CORS_HEADERS,
+  });
 };
 
 export const OPTIONS = GET;
