@@ -15,6 +15,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import HeadImage from "@/public/teleHealth.jpg";
 
 const PLATFORM_ADDRESS: PublicKey = new PublicKey(
   "Sab5y7LG3VefLz4E6DSCkxdmjG4pve3hcAb8NUPKn42",
@@ -34,7 +35,7 @@ const DOCTOR_ABDALLAH_FEE = 0.2;
 export const GET = async (req: Request) => {
     const payload: ActionGetResponse = {
       title: "Schedule a session with your favourite doctors from around the world - with just a single click!",
-      icon: "https://solana.com/_next/static/media/logotype.e4df684f.svg",
+      icon: `${HeadImage}`,
       description: "Book a session with your favorite DOCTOR",
       label: "Book a session",
       links: {
