@@ -16,12 +16,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-// export const database = getDatabase(app);
+export const database = getDatabase(app);
 
 export const auth = getAuth(app);
 
-export const database = getDatabase(app);
-if (location.hostname === "localhost") {
-  // Point to the RTDB emulator running on localhost.
-  connectDatabaseEmulator(database, "127.0.0.1", 9000);
-}
+// export const database = getDatabase(app);
+// if (location.hostname === "localhost") {
+//   // Point to the RTDB emulator running on localhost.
+//   connectDatabaseEmulator(database, "127.0.0.1", 9000);
+// }
