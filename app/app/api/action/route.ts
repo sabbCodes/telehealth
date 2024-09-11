@@ -106,10 +106,16 @@ export const POST = async (req: Request) => {
   // const time = url.searchParams.get('time');
   // const doctor = url.searchParams.get('doctor');
 
-  // Safely access parameters from the `data` property
-  const date = body.data?.date; // This will be a string or undefined
-  const time = body.data?.time; 
-  const doctor = body.data?.doctor;
+  // Safely cast the `data` property to the expected structure
+  const data = body.data as {
+    date?: string;
+    time?: string;
+    doctor?: string;
+  };
+
+  const date = data.date;
+  const time = data.time;
+  const doctor = data.doctor;
 
   if (!date || !time || !doctor) {
     return new Response('Missing parameters', {
