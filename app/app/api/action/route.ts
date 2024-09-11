@@ -33,8 +33,8 @@ const DOCTOR_SABB_FEE = 0.1;
 const DOCTOR_ABDALLAH_FEE = 0.2;
 
 const headers = createActionHeaders({
-  chainId: "devnet", // or chainId: "devnet"
-  actionVersion: "2.2.1", // the desired spec version
+  chainId: "devnet", // or "mainnet"
+  actionVersion: "2.2.1",
 });
 
 export const GET = async (req: Request) => {
@@ -88,18 +88,95 @@ export const GET = async (req: Request) => {
     }
   };
 
-  // const headers = {
-  //   ...ACTIONS_CORS_HEADERS,
-  //   'X-Action-Version': '2.2.1',
-  //   'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
-  // }
-
   return new Response(JSON.stringify(payload), { headers });
 };
 
 export const OPTIONS = async (req: Request) => {
   return new Response(null, { headers });
 };
+
+// export const POST = async (req: Request) => {
+//   const body: ActionPostRequest = await req.json();
+
+//   const url = new URL(req.url);
+//   const date = url.searchParams.get('date');
+//   const time = url.searchParams.get('time');
+//   const doctor = url.searchParams.get('doctor');
+
+//   // Determine the consultation fee and doctor’s wallet address
+//   let consultationFeeInSol = 0;
+//   let doctorWalletAddress = '';
+
+//   if (doctor === 'Dr. Sabb') {
+//       consultationFeeInSol = DOCTOR_SABB_FEE;
+//       doctorWalletAddress = DOCTOR_SABB_ADDRESS.toBase58();
+//   } else if (doctor === 'Dr. Abdallah') {
+//       consultationFeeInSol = DOCTOR_ABDALLAH_FEE;
+//       doctorWalletAddress = DOCTOR_ABDALLAH_ADDRESS.toBase58();
+//   } else {
+//       return new Response('Invalid doctor selected', {
+//           status: 400,
+//           headers: ACTIONS_CORS_HEADERS,
+//       });
+//   }
+
+//   const platformFeeInLamports = Math.round((consultationFeeInSol * 0.1) * LAMPORTS_PER_SOL);
+//   const doctorFeeInLamports = Math.round((consultationFeeInSol * 0.9) * LAMPORTS_PER_SOL);
+
+//   let accountPubKey: PublicKey;
+//   try {
+//       accountPubKey = new PublicKey(body.account);
+//   } catch (err) {
+//     console.error("error fetching pubkey", err);
+//       return new Response('Invalid "account" provided', {
+//           status: 400,
+//           headers: ACTIONS_CORS_HEADERS,
+//       });
+//   }
+
+//   const connection = new Connection(clusterApiUrl("devnet"));
+//   const { blockhash } = await connection.getLatestBlockhash();
+
+//   const transaction = new Transaction({
+//     recentBlockhash: blockhash,
+//     feePayer: accountPubKey,
+//   }).add(
+//     SystemProgram.transfer({
+//       fromPubkey: accountPubKey,
+//       toPubkey: PLATFORM_ADDRESS,
+//       lamports: platformFeeInLamports,
+//     }),
+//     SystemProgram.transfer({
+//       fromPubkey: accountPubKey,
+//       toPubkey: new PublicKey(doctorWalletAddress),
+//       lamports: doctorFeeInLamports,
+//     })
+//   );
+
+//   const payload: ActionPostResponse = await createPostResponse({
+//       fields: {
+//           transaction,
+//           message: `Booking confirmed with ${doctor} for ${date} at ${time}. You can head to teleHealthSol to have your session!`,
+//       },
+//   });
+
+//   const bookingDetails = {
+//     userId: accountPubKey.toBase58(),
+//     doctorId: doctorWalletAddress,
+//     date: date,
+//     time: time,
+//     status: 'Booked',
+//   };
+
+//   await addDoc(collection(db, 'bookings'), bookingDetails);
+
+//   return new Response(JSON.stringify(payload), {
+//     headers: headers,
+//     status: 200
+//   });
+// };
+
+
 
 export const POST = async (req: Request) => {
   const body: ActionPostRequest = await req.json();
@@ -114,16 +191,16 @@ export const POST = async (req: Request) => {
   let doctorWalletAddress = '';
 
   if (doctor === 'Dr. Sabb') {
-      consultationFeeInSol = DOCTOR_SABB_FEE;
-      doctorWalletAddress = DOCTOR_SABB_ADDRESS.toBase58();
+    consultationFeeInSol = DOCTOR_SABB_FEE;
+    doctorWalletAddress = DOCTOR_SABB_ADDRESS.toBase58();
   } else if (doctor === 'Dr. Abdallah') {
-      consultationFeeInSol = DOCTOR_ABDALLAH_FEE;
-      doctorWalletAddress = DOCTOR_ABDALLAH_ADDRESS.toBase58();
+    consultationFeeInSol = DOCTOR_ABDALLAH_FEE;
+    doctorWalletAddress = DOCTOR_ABDALLAH_ADDRESS.toBase58();
   } else {
-      return new Response('Invalid doctor selected', {
-          status: 400,
-          headers: ACTIONS_CORS_HEADERS,
-      });
+    return new Response('Invalid doctor selected', {
+      status: 400,
+      headers: headers, // Use correct headers here
+    });
   }
 
   const platformFeeInLamports = Math.round((consultationFeeInSol * 0.1) * LAMPORTS_PER_SOL);
@@ -131,13 +208,13 @@ export const POST = async (req: Request) => {
 
   let accountPubKey: PublicKey;
   try {
-      accountPubKey = new PublicKey(body.account);
+    accountPubKey = new PublicKey(body.account);
   } catch (err) {
     console.error("error fetching pubkey", err);
-      return new Response('Invalid "account" provided', {
-          status: 400,
-          headers: ACTIONS_CORS_HEADERS,
-      });
+    return new Response('Invalid "account" provided', {
+      status: 400,
+      headers: headers, // Use correct headers here
+    });
   }
 
   const connection = new Connection(clusterApiUrl("devnet"));
@@ -160,10 +237,10 @@ export const POST = async (req: Request) => {
   );
 
   const payload: ActionPostResponse = await createPostResponse({
-      fields: {
-          transaction,
-          message: `Booking confirmed with ${doctor} for ${date} at ${time}. You can head to teleHealthSol to have your session!`,
-      },
+    fields: {
+      transaction,
+      message: `Booking confirmed with ${doctor} for ${date} at ${time}. You can head to teleHealthSol to have your session!`,
+    },
   });
 
   const bookingDetails = {
@@ -176,14 +253,8 @@ export const POST = async (req: Request) => {
 
   await addDoc(collection(db, 'bookings'), bookingDetails);
 
-  // const headers = {
-  //   ...ACTIONS_CORS_HEADERS,
-  //   'X-Action-Version': '2.2.1',
-  //   'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
-  // }
-
   return new Response(JSON.stringify(payload), {
-    headers: headers,
+    headers: headers, // Use correct headers here
     status: 200
   });
 };
