@@ -91,13 +91,6 @@ export const GET = async (req: Request) => {
   return new Response(JSON.stringify(payload), { headers });
 };
 
-// export const OPTIONS = async () => {
-//   return new Response(null, {
-//     headers: ACTIONS_CORS_HEADERS,
-//     status: 204
-//   });
-// };
-
 export const OPTIONS = async (req: Request) => {
   return new Response(null, {
     headers: {
