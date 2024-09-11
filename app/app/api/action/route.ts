@@ -101,28 +101,10 @@ export const OPTIONS = async (req: Request) => {
 export const POST = async (req: Request) => {
   const body: ActionPostRequest = await req.json();
 
-  // const url = new URL(req.url);
-  // const date = url.searchParams.get('date');
-  // const time = url.searchParams.get('time');
-  // const doctor = url.searchParams.get('doctor');
-
-  // Safely cast the `data` property to the expected structure
-  const data = body.data as {
-    date?: string;
-    time?: string;
-    doctor?: string;
-  };
-
-  const date = data.date;
-  const time = data.time;
-  const doctor = data.doctor;
-
-  if (!date || !time || !doctor) {
-    return new Response('Missing parameters', {
-      status: 400,
-      headers: headers, 
-    });
-  }
+  const url = new URL(req.url);
+  const date = url.searchParams.get('date');
+  const time = url.searchParams.get('time');
+  const doctor = url.searchParams.get('doctor');
 
   // Determine the consultation fee and doctor’s wallet address
   let consultationFeeInSol = 0;
