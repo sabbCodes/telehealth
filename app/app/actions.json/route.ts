@@ -10,7 +10,7 @@ export const GET = async () => {
       },
       // idempotent rule as the fallback
       {
-        pathPattern: "/api/action/**",
+        pathPattern: "/api/action",
         apiPath: "/api/action",
       },
     ],
