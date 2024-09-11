@@ -5,7 +5,7 @@ export const GET = async () => {
     rules: [
       // map all root level routes to an action
       {
-        pathPattern: "/**",
+        pathPattern: "/*****",
         apiPath: "https://telehealthsol.health/api/action",
       },
       // idempotent rule as the fallback
