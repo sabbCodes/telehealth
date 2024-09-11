@@ -40,61 +40,6 @@ const headers = {
   'Content-Type': 'application/json',
 }
 
-// export const GET = async (req: Request) => {
-//   const reqURL = new URL(req.url);
-//   const iconUrl = new URL("/teleHealth.jpg", reqURL.origin);
-
-//   const payload: ActionGetResponse = {
-//     type: "action",
-//     title: "Schedule a session with your favourite doctors from around the world - with just a single click!",
-//     icon: iconUrl.toString(),
-//     description: "Book a session with your favorite DOCTOR",
-//     label: "Book a session",
-//     links: {
-//       actions: [
-//         {
-//           href: `${req.url}/{date}&time={time}&doctor={doctor}`,
-//           label: "Schedule meeting now!",
-//           parameters: [
-//             {
-//               name: "date",
-//               type: "date",
-//               label: "Session date",
-//               required: true
-//             },
-//             {
-//               name: "time",
-//               type: "select",
-//               label: "Session time",
-//               options: [
-//                 { value: "8 AM", label: "8 AM" },
-//                 { value: "9 AM", label: "9 AM" },
-//                 { value: "10 AM", label: "10 AM" },
-//                 { value: "11 AM", label: "11 AM" },
-//                 { value: "12 PM", label: "12 PM" }
-//               ],
-//               required: true
-//             },
-//             {
-//               name: "doctor",
-//               type: "select",
-//               label: "Choose doctor",
-//               options: [
-//                 { value: "Dr. Abdallah", label: "Dr. Abdallah" },
-//                 { value: "Dr. Sabb", label: "Dr. Sabb" }
-//               ],
-//               required: true
-//             }
-//           ]
-//         }
-//       ]
-//     }
-//   };
-
-//   return new Response(JSON.stringify(payload), { headers });
-// };
-
-
 export const GET = async (req: Request) => {
   const reqURL = new URL(req.url);
   const iconUrl = new URL("/teleHealth.jpg", reqURL.origin);
@@ -108,7 +53,7 @@ export const GET = async (req: Request) => {
     links: {
       actions: [
         {
-          href: `${req.url}/{date}/{time}/{doctor}`,
+          href: `/api/action?date={date}&time={time}&doctor={doctor}`,
           label: "Schedule meeting now!",
           parameters: [
             {
@@ -238,16 +183,10 @@ export const OPTIONS = async (req: Request) => {
 export const POST = async (req: Request) => {
   const body: ActionPostRequest = await req.json();
 
-  // const url = new URL(req.url);
-  // const date = url.searchParams.get('date');
-  // const time = url.searchParams.get('time');
-  // const doctor = url.searchParams.get('doctor');
-
-  // Extract parameters from the URL path
-  const urlParts = new URL(req.url).pathname.split('/');
-  const date = urlParts[urlParts.length - 3];
-  const time = urlParts[urlParts.length - 2];
-  const doctor = urlParts[urlParts.length - 1];
+  const url = new URL(req.url);
+  const date = url.searchParams.get('date');
+  const time = url.searchParams.get('time');
+  const doctor = url.searchParams.get('doctor');
 
   // Determine the consultation fee and doctor's wallet address
   let consultationFeeInSol = 0;
