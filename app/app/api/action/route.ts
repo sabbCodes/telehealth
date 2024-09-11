@@ -85,7 +85,7 @@ export const GET = async (req: Request) => {
   const headers = {
     ...ACTIONS_CORS_HEADERS,
     'X-Action-Version': '2.1.3',
-    'X-Blockchain-Ids': 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+    'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
   }
 
   return new Response(JSON.stringify(payload), { headers });
@@ -96,7 +96,7 @@ export const OPTIONS = async (req: Request) => {
     headers: {
       ...ACTIONS_CORS_HEADERS,
       'X-Action-Version': '2.1.3',
-      'X-Blockchain-Ids': 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+      'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
     }
   });
 };
@@ -179,7 +179,7 @@ export const POST = async (req: Request) => {
   const headers = {
     ...ACTIONS_CORS_HEADERS,
     'X-Action-Version': '2.1.3',
-    'X-Blockchain-Ids': 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+    'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
   }
 
   return new Response(JSON.stringify(payload), {
