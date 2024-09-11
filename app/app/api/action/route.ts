@@ -6,6 +6,7 @@ import {
   createPostResponse,
   ActionGetResponse,
   ActionPostRequest,
+  createActionHeaders,
 } from "@solana/actions";
 import {
   clusterApiUrl,
@@ -30,6 +31,11 @@ const DOCTOR_ABDALLAH_ADDRESS: PublicKey = new PublicKey(
 
 const DOCTOR_SABB_FEE = 0.1;
 const DOCTOR_ABDALLAH_FEE = 0.2;
+
+const headers = createActionHeaders({
+  chainId: "devnet", // or chainId: "devnet"
+  actionVersion: "2.2.1", // the desired spec version
+});
 
 export const GET = async (req: Request) => {
   const reqURL = new URL(req.url);
@@ -82,23 +88,17 @@ export const GET = async (req: Request) => {
     }
   };
 
-  const headers = {
-    ...ACTIONS_CORS_HEADERS,
-    'X-Action-Version': '2.2.1',
-    'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
-  }
+  // const headers = {
+  //   ...ACTIONS_CORS_HEADERS,
+  //   'X-Action-Version': '2.2.1',
+  //   'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
+  // }
 
   return new Response(JSON.stringify(payload), { headers });
 };
 
 export const OPTIONS = async (req: Request) => {
-  return new Response(null, {
-    headers: {
-      ...ACTIONS_CORS_HEADERS,
-      'X-Action-Version': '2.2.1',
-      'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
-    }
-  });
+  return new Response(null, { headers });
 };
 
 export const POST = async (req: Request) => {
@@ -176,11 +176,11 @@ export const POST = async (req: Request) => {
 
   await addDoc(collection(db, 'bookings'), bookingDetails);
 
-  const headers = {
-    ...ACTIONS_CORS_HEADERS,
-    'X-Action-Version': '2.2.1',
-    'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
-  }
+  // const headers = {
+  //   ...ACTIONS_CORS_HEADERS,
+  //   'X-Action-Version': '2.2.1',
+  //   'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
+  // }
 
   return new Response(JSON.stringify(payload), {
     headers: headers,
