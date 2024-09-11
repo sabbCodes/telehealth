@@ -84,7 +84,7 @@ export const GET = async (req: Request) => {
 
   const headers = {
     ...ACTIONS_CORS_HEADERS,
-    'X-Action-Version': '2.1.3',
+    'X-Action-Version': '2.2.1',
     'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
   }
 
@@ -95,7 +95,7 @@ export const OPTIONS = async (req: Request) => {
   return new Response(null, {
     headers: {
       ...ACTIONS_CORS_HEADERS,
-      'X-Action-Version': '2.1.3',
+      'X-Action-Version': '2.2.1',
       'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
     }
   });
@@ -178,7 +178,7 @@ export const POST = async (req: Request) => {
 
   const headers = {
     ...ACTIONS_CORS_HEADERS,
-    'X-Action-Version': '2.1.3',
+    'X-Action-Version': '2.2.1',
     'X-Blockchain-Ids': 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
   }
 
