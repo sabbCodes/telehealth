@@ -34,7 +34,7 @@ const DOCTOR_ABDALLAH_FEE = 0.2;
 
 const headers = {
   ...createActionHeaders({
-    chainId: "devnet", // or "mainnet"
+    chainId: "mainnet", // or "devnet"
     actionVersion: "2.2.1",
   }),
   'Content-Type': 'application/json',
