@@ -53,7 +53,7 @@ export const GET = async (req: Request) => {
     links: {
       actions: [
         {
-          href: `/api/action?date=2024/09/12&time=10 AM&doctor=Dr. Sabb`,
+          href: `/api/action?date={date}&time={time}&doctor={doctor}`,
           label: "Schedule meeting now!",
           parameters: [
             {
