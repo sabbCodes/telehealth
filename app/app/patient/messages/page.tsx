@@ -32,7 +32,7 @@ function Messages() {
                     <div className='flex gap-2'>
                         <Image src={DocImg} alt='doctor profile image' className='w-10 h-10 rounded-full' />
                         <div className='leading-none flex flex-col justify-center'>
-                            <p className='leading-none text-custom-black font-semibold text-base m-0'>Dr. Adam Hawa</p>
+                            <p className='leading-none text-custom-black font-semibold text-base m-0'>Dr. Sabb Abbas</p>
                             <p className='leading-none text-sm m-0 p-0'>How do you feel today?</p>
                         </div>
                     </div>
