@@ -32,13 +32,13 @@ const DOCTOR_ABDALLAH_ADDRESS: PublicKey = new PublicKey(
 const DOCTOR_SABB_FEE = 0.1;
 const DOCTOR_ABDALLAH_FEE = 0.2;
 
-// const headers = {
-//   ...createActionHeaders({
-//     chainId: "devnet", // or "mainnet"
-//     actionVersion: "2.2.1",
-//   }),
-//   'Content-Type': 'application/json',
-// }
+const headers = {
+  ...createActionHeaders({
+    chainId: "devnet", // or "mainnet"
+    actionVersion: "2.2.1",
+  }),
+  'Content-Type': 'application/json',
+}
 
 export const GET = async (req: Request) => {
   const reqURL = new URL(req.url);
@@ -91,11 +91,11 @@ export const GET = async (req: Request) => {
     }
   };
 
-  return new Response(JSON.stringify(payload), { headers: ACTIONS_CORS_HEADERS });
+  return new Response(JSON.stringify(payload), { headers });
 };
 
 export const OPTIONS = async (req: Request) => {
-  return new Response(null, { headers: ACTIONS_CORS_HEADERS });
+  return new Response(null, { headers });
 };
 
 export const POST = async (req: Request) => {
@@ -119,7 +119,7 @@ export const POST = async (req: Request) => {
   } else {
     return new Response('Invalid doctor selected', {
       status: 400,
-      headers: ACTIONS_CORS_HEADERS,
+      headers: headers,
     });
   }
 
@@ -133,7 +133,7 @@ export const POST = async (req: Request) => {
     console.error("error fetching pubkey", err);
     return new Response('Invalid "account" provided', {
       status: 400,
-      headers: ACTIONS_CORS_HEADERS,
+      headers: headers,
     });
   }
 
@@ -174,7 +174,7 @@ export const POST = async (req: Request) => {
   await addDoc(collection(db, 'bookings'), bookingDetails);
 
   return new Response(JSON.stringify(payload), {
-    headers: ACTIONS_CORS_HEADERS, // Use correct headers here
+    headers: headers, // Use correct headers here
     status: 200
   });
 };
