@@ -2,7 +2,6 @@ import { db } from "@/app/components/firebase-config";
 import { addDoc, collection } from "@firebase/firestore";
 import {
   ActionPostResponse,
-  ACTIONS_CORS_HEADERS,
   createPostResponse,
   ActionGetResponse,
   ActionPostRequest,
