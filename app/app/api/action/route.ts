@@ -32,13 +32,13 @@ const DOCTOR_ABDALLAH_ADDRESS: PublicKey = new PublicKey(
 const DOCTOR_SABB_FEE = 0.1;
 const DOCTOR_ABDALLAH_FEE = 0.2;
 
-const headers = {
-  ...createActionHeaders({
-    chainId: "devnet", // or "mainnet"
-    actionVersion: "2.2.1",
-  }),
-  'Content-Type': 'application/json',
-}
+// const headers = {
+//   ...createActionHeaders({
+//     chainId: "devnet", // or "mainnet"
+//     actionVersion: "2.2.1",
+//   }),
+//   'Content-Type': 'application/json',
+// }
 
 export const GET = async (req: Request) => {
   const reqURL = new URL(req.url);
@@ -55,47 +55,47 @@ export const GET = async (req: Request) => {
         {
           href: `/api/action?date=2024/09/12&time=10 AM&doctor=Dr. Sabb`,
           label: "Schedule meeting now!",
-          // parameters: [
-          //   {
-          //     name: "date",
-          //     type: "date",
-          //     label: "Session date",
-          //     required: true
-          //   },
-          //   {
-          //     name: "time",
-          //     type: "select",
-          //     label: "Session time",
-          //     options: [
-          //       { value: "8 AM", label: "8 AM" },
-          //       { value: "9 AM", label: "9 AM" },
-          //       { value: "10 AM", label: "10 AM" },
-          //       { value: "11 AM", label: "11 AM" },
-          //       { value: "12 PM", label: "12 PM" }
-          //     ],
-          //     required: true
-          //   },
-          //   {
-          //     name: "doctor",
-          //     type: "select",
-          //     label: "Choose doctor",
-          //     options: [
-          //       { value: "Dr. Abdallah", label: "Dr. Abdallah" },
-          //       { value: "Dr. Sabb", label: "Dr. Sabb" }
-          //     ],
-          //     required: true
-          //   }
-          // ]
+          parameters: [
+            {
+              name: "date",
+              type: "date",
+              label: "Session date",
+              required: true
+            },
+            {
+              name: "time",
+              type: "select",
+              label: "Session time",
+              options: [
+                { value: "8 AM", label: "8 AM" },
+                { value: "9 AM", label: "9 AM" },
+                { value: "10 AM", label: "10 AM" },
+                { value: "11 AM", label: "11 AM" },
+                { value: "12 PM", label: "12 PM" }
+              ],
+              required: true
+            },
+            {
+              name: "doctor",
+              type: "select",
+              label: "Choose doctor",
+              options: [
+                { value: "Dr. Abdallah", label: "Dr. Abdallah" },
+                { value: "Dr. Sabb", label: "Dr. Sabb" }
+              ],
+              required: true
+            }
+          ]
         }
       ]
     }
   };
 
-  return new Response(JSON.stringify(payload), { headers });
+  return new Response(JSON.stringify(payload), { headers: ACTIONS_CORS_HEADERS });
 };
 
 export const OPTIONS = async (req: Request) => {
-  return new Response(null, { headers });
+  return new Response(null, { headers: ACTIONS_CORS_HEADERS });
 };
 
 export const POST = async (req: Request) => {
@@ -119,7 +119,7 @@ export const POST = async (req: Request) => {
   } else {
     return new Response('Invalid doctor selected', {
       status: 400,
-      headers: headers,
+      headers: ACTIONS_CORS_HEADERS,
     });
   }
 
@@ -133,7 +133,7 @@ export const POST = async (req: Request) => {
     console.error("error fetching pubkey", err);
     return new Response('Invalid "account" provided', {
       status: 400,
-      headers: headers,
+      headers: ACTIONS_CORS_HEADERS,
     });
   }
 
@@ -174,7 +174,7 @@ export const POST = async (req: Request) => {
   await addDoc(collection(db, 'bookings'), bookingDetails);
 
   return new Response(JSON.stringify(payload), {
-    headers: headers, // Use correct headers here
+    headers: ACTIONS_CORS_HEADERS, // Use correct headers here
     status: 200
   });
 };
