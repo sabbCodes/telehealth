@@ -53,39 +53,39 @@ export const GET = async (req: Request) => {
     links: {
       actions: [
         {
-          href: `/api/action?date={date}&time={time}&doctor={doctor}`,
+          href: `/api/action?date=2024/09/12&time=10 AM&doctor=Dr. Sabb`,
           label: "Schedule meeting now!",
-          parameters: [
-            {
-              name: "date",
-              type: "date",
-              label: "Session date",
-              required: true
-            },
-            {
-              name: "time",
-              type: "select",
-              label: "Session time",
-              options: [
-                { value: "8 AM", label: "8 AM" },
-                { value: "9 AM", label: "9 AM" },
-                { value: "10 AM", label: "10 AM" },
-                { value: "11 AM", label: "11 AM" },
-                { value: "12 PM", label: "12 PM" }
-              ],
-              required: true
-            },
-            {
-              name: "doctor",
-              type: "select",
-              label: "Choose doctor",
-              options: [
-                { value: "Dr. Abdallah", label: "Dr. Abdallah" },
-                { value: "Dr. Sabb", label: "Dr. Sabb" }
-              ],
-              required: true
-            }
-          ]
+          // parameters: [
+          //   {
+          //     name: "date",
+          //     type: "date",
+          //     label: "Session date",
+          //     required: true
+          //   },
+          //   {
+          //     name: "time",
+          //     type: "select",
+          //     label: "Session time",
+          //     options: [
+          //       { value: "8 AM", label: "8 AM" },
+          //       { value: "9 AM", label: "9 AM" },
+          //       { value: "10 AM", label: "10 AM" },
+          //       { value: "11 AM", label: "11 AM" },
+          //       { value: "12 PM", label: "12 PM" }
+          //     ],
+          //     required: true
+          //   },
+          //   {
+          //     name: "doctor",
+          //     type: "select",
+          //     label: "Choose doctor",
+          //     options: [
+          //       { value: "Dr. Abdallah", label: "Dr. Abdallah" },
+          //       { value: "Dr. Sabb", label: "Dr. Sabb" }
+          //     ],
+          //     required: true
+          //   }
+          // ]
         }
       ]
     }
