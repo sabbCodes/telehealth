@@ -136,7 +136,7 @@ export const POST = async (req: Request) => {
     });
   }
 
-  const connection = new Connection(clusterApiUrl("devnet"));
+  const connection = new Connection(clusterApiUrl("mainnet-beta"));
   const { blockhash } = await connection.getLatestBlockhash();
 
   const transaction = new Transaction({
