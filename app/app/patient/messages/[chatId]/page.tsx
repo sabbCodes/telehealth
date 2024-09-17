@@ -13,21 +13,46 @@ import MicrophoneIcon from '@/public/microphone-2.svg';
 import SendIcon from '@/public/send.svg';
 import { database, db } from '@/app/components/firebase-config';
 import { addDoc, collection, getDocs, query, where } from '@firebase/firestore';
+import { useWallet } from '@solana/wallet-adapter-react';
+import PopupWallet from '@/app/components/PopupWallet';
+import { useParams } from 'next/navigation';
 
 interface CryptoKeyPair {
     publicKey: CryptoKey;
     privateKey: CryptoKey;
 }
 
+interface DoctorDetails {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: number;
+    allergies: string;
+    medicalHistory: string;
+    walletAddress: string;
+}
+
 function Chat() {
+    const wallet = useWallet();
     const [message, setMessage] = useState('');
     const [decryptedMessages, setDecryptedMessages] = useState<any[]>([]);
     const [chatKeyPair, setChatKeyPair] = useState<CryptoKeyPair | null>(null);
     const [otherPublicKey, setOtherPublicKey] = useState<string | null>(null);
     const [publicKeyStoredInDb, setPublicKeyStoredInDb] = useState(false);
-    const userId = "FD7MWBjwqRH41KmdnXiHNqdUMnjLHpXGCyZnXosVHcR";
-    const chatId = '74bd3SEfw5hkLx8xLnx7NLvLjjTsK2tV6TKRZxEvB1GL';  // Replace with the actual public key
+    const [showConnectWallet, setShowConnectWallet] = useState(false);
+    const [doctorDetails, setDoctorDetails] = useState<DoctorDetails | null>(null);
+    const { chatId } = useParams();
+    // const userId = "FD7MWBjwqRH41KmdnXiHNqdUMnjLHpXGCyZnXosVHcR";
+    // const chatId = '74bd3SEfw5hkLx8xLnx7NLvLjjTsK2tV6TKRZxEvB1GL';  // Replace with the actual public key
     const chatRef = ref(database, 'chats/doctor-patient-chat');
+    let userId: string;
+
+    useEffect(() => {
+        if (wallet.connected && wallet.publicKey) {
+          userId = wallet.publicKey.toString();
+        } else {
+          setShowConnectWallet(true);
+        }
+    }, [wallet]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(e.target.value);
@@ -285,6 +310,29 @@ function Chat() {
         };
     }, [chatRef, chatKeyPair, publicKey]);
 
+    useEffect(() => {
+        const fetchDoctorDetails = async () => {
+            if (chatId) {
+                try {
+                    const doctorsRef = collection(db, 'users');
+                    const q = query(doctorsRef, where("walletAddress", "==", chatId as string));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const patientDoc = querySnapshot.docs[0].data() as DoctorDetails;
+                        setDoctorDetails(patientDoc);
+                    } else {
+                        console.error('Patient not found');
+                    }
+                } catch (error) {
+                    console.error('Error fetching patient details:', error);
+                }
+            }
+        };
+
+        fetchDoctorDetails();
+    }, [chatId]);
+
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
             <div className='flex mt-2 justify-between items-center'>
@@ -295,7 +343,7 @@ function Chat() {
                     <div className='flex gap-2'>
                         <Image src={DocImg} alt='doctor profile image' className='w-10 h-10 rounded-full' />
                         <div className='leading-none flex flex-col justify-center'>
-                            <p className='leading-none text-custom-black font-semibold text-base m-0'>Dr. Adam Hawa</p>
+                            <p className='leading-none text-custom-black font-semibold text-base m-0'>Dr. {doctorDetails?.firstName} {doctorDetails?.lastName}</p>
                             <p className='leading-none text-xs text-dark-grey m-0 p-0'>Active now!</p>
                         </div>
                     </div>
@@ -338,6 +386,9 @@ function Chat() {
                     )}
                 </div>
             </div>
+            {showConnectWallet && (
+                <PopupWallet onClose={() => setShowConnectWallet(false)} />
+            )}
         </main>
     );
 }

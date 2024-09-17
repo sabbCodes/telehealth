@@ -14,7 +14,7 @@ import { useParams } from 'next/navigation';
 import { database, db } from '@/app/components/firebase-config';
 import PatientDetailsPopup from '@/app/components/PatientDetailsPopup';
 import { PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, BN, web3 } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, web3 } from '@coral-xyz/anchor';
 import idl from '@/app/components/libs/tele_health.json';
 import type { TeleHealth } from '@/app/components/libs/tele_health';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -24,6 +24,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { addDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, push, onValue, off } from "firebase/database";
 import PopupWallet from '@/app/components/PopupWallet';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientDetails {
     firstName: string;
@@ -79,7 +80,15 @@ function Chat() {
     const chatRef = ref(database, 'chats/doctor-patient-chat');
     const [publicKey, setPublicKey] = useState<string | null>(null);
     const [publicKeyStoredInDb, setPublicKeyStoredInDb] = useState(false);
-    const userId = "74bd3SEfw5hkLx8xLnx7NLvLjjTsK2tV6TKRZxEvB1GL";
+    let userId: string;
+
+    useEffect(() => {
+        if (wallet.connected && wallet.publicKey) {
+          userId = wallet.publicKey.toString();
+        } else {
+          setShowConnectWallet(true);
+        }
+      }, [wallet]);
 
     // 1. Key Generation
     const generateKeyPair = async (): Promise<CryptoKeyPair> => {
@@ -359,7 +368,6 @@ function Chat() {
         queryFn: async () => {
             if (!patientDetails) {
                 throw new Error('No patient details available')
-                setShowConnectWallet(true);
             };
 
             const patientPublicKey = new PublicKey(patientDetails.walletAddress);
@@ -394,8 +402,8 @@ function Chat() {
     const createEntry = useMutation({
         mutationFn: async () => {
             if (!wallet.publicKey || !patientDetails?.walletAddress) {
-                throw new Error('Missing wallet or patient details.');
                 setShowConnectWallet(true);
+                throw new Error('Missing wallet or patient details.');
             }
 
             const record = web3.Keypair.generate();
@@ -478,7 +486,7 @@ function Chat() {
                     loading={loading}
                 />
             )}
-            <div>
+            <div className='pb-12'>
                 <h3 className='text-center bg-doc-bg w-14 h-6 flex justify-center items-center p-2 text-sm mx-auto mt-2 rounded-lg'>Today</h3>
                 {decryptedMessages.map((msg, index) => (
                     <div key={index} className={`flex flex-col my-1 ${msg.sender === publicKey?.toString() ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
