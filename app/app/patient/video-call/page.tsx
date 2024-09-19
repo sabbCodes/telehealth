@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { collection, onSnapshot, addDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/app/components/firebase-config';
 import './videocall.css';
@@ -13,7 +13,7 @@ const servers = {
   iceCandidatePoolSize: 10,
 };
 
-function VideoCall() {
+function VideoCallComponent() {
   const wallet = useWallet();
   const [showConnectWallet, setShowConnectWallet] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -256,4 +256,10 @@ function VideoCall() {
   );
 }
 
-export default VideoCall;
+export default function VideoCall() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VideoCallComponent />
+    </Suspense>
+  );
+}
