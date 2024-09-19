@@ -50,16 +50,16 @@ function Schedule() {
                 const bookingsRef = collection(db, 'bookings');
                 const q = query(bookingsRef, where('userId', '==', publicKey.toString()));
                 const querySnapshot = await getDocs(q);
-        
+
                 const bookingsData = await Promise.all(
                     querySnapshot.docs.map(async (docSnapshot) => {
                         const bookingData = docSnapshot.data() as Booking; // Cast as Booking type
-        
+
                         // Fetch doctor details from "users" collection using doctorId
                         const usersRef = collection(db, 'users');
                         const userQuery = query(usersRef, where('walletAddress', '==', bookingData.doctorId));
                         const userSnapshot = await getDocs(userQuery);
-                        
+
                         let doctorData: Doctor | null = null;
                         if (!userSnapshot.empty) {
                             const userData = userSnapshot.docs[0].data() as Doctor; // Get the first matched document
@@ -68,14 +68,14 @@ function Schedule() {
                                 specialization: userData.specialization,
                             };
                         }
-        
+
                         return {
                             ...bookingData, // Spread booking data (date, doctorId, etc.)
                             doctor: doctorData // Add doctor details
                         };
                     })
                 );
-        
+
                 setBookings(bookingsData);
             } catch (error) {
                 console.error('Error fetching bookings:', error);
