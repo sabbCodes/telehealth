@@ -16,6 +16,7 @@ import { addDoc, collection, getDocs, query, where } from '@firebase/firestore';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PopupWallet from '@/app/components/PopupWallet';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface CryptoKeyPair {
     publicKey: CryptoKey;
@@ -41,8 +42,7 @@ function Chat() {
     const [showConnectWallet, setShowConnectWallet] = useState(false);
     const [doctorDetails, setDoctorDetails] = useState<DoctorDetails | null>(null);
     const { chatId } = useParams();
-    // const userId = "FD7MWBjwqRH41KmdnXiHNqdUMnjLHpXGCyZnXosVHcR";
-    // const chatId = '74bd3SEfw5hkLx8xLnx7NLvLjjTsK2tV6TKRZxEvB1GL';  // Replace with the actual public key
+    const router = useRouter();
     const chatRef = ref(database, 'chats/doctor-patient-chat');
     let userId: string;
 
@@ -225,7 +225,27 @@ function Chat() {
         };
 
         initKeyPair();
-    }, [chatId]);  // Empty dependency array ensures this effect runs only once
+    }, [chatId]);
+
+    const formatTimestamp = (timestamp: number): string => {
+        if (typeof timestamp !== 'number' || isNaN(timestamp)) {
+            console.error('Invalid timestamp:', timestamp);
+            return 'Invalid Time';
+        }
+
+        const date = new Date(timestamp);
+
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date object:', date);
+            return 'Invalid Time';
+        }
+
+        return date.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // Ensures 24-hour format
+        });
+    };
 
     const handleSend = async () => {
         if (!otherPublicKey || !message.trim() || !chatKeyPair) return;
@@ -241,7 +261,8 @@ function Chat() {
 
                 // Push the encrypted message to the database
                 push(chatRef, {
-                    sender: publicKey,
+                    sender: publicKey,       // Sender's public key
+                    recipient: otherPublicKey, // Recipient's public key
                     message: encryptedMessage,
                     timestamp,
                 });
@@ -253,6 +274,7 @@ function Chat() {
                         content: message, // Add the plain text message
                         sender: publicKey,
                         timestamp,
+                        formattedTime: formatTimestamp(timestamp),
                     },
                 ]);
 
@@ -267,9 +289,15 @@ function Chat() {
     useEffect(() => {
         const handleNewMessages = async (snapshot: any) => {
             const messages = snapshot.val();
-            if (messages && chatKeyPair) {
+            if (messages && chatKeyPair && publicKey) {
                 const newMessages = await Promise.all(
                     Object.entries(messages).map(async ([key, msg]: [string, any]) => {
+                        // Filter messages based on recipient
+                        if (msg.recipient !== publicKey && msg.sender !== publicKey) {
+                            // Skip messages where the current user is neither the sender nor the recipient
+                            return null;
+                        }
+
                         if (msg.sender === publicKey) {
                             // Skip decryption for messages sent by the current user
                             return null;
@@ -281,6 +309,7 @@ function Chat() {
                                     content: decryptedContent,
                                     sender: msg.sender,
                                     timestamp: msg.timestamp,
+                                    formattedTime: formatTimestamp(msg.timestamp),
                                 };
                             } catch (error) {
                                 console.error('Failed to decrypt message:', error);
@@ -290,7 +319,7 @@ function Chat() {
                     })
                 );
 
-                // Filter out null values (messages from the current user)
+                // Filter out null values (messages that are not meant for this user)
                 const filteredNewMessages = newMessages.filter(msg => msg !== null);
 
                 if (filteredNewMessages.length > 0) {
@@ -333,6 +362,15 @@ function Chat() {
         fetchDoctorDetails();
     }, [chatId]);
 
+    const handleVideoCallClick = () => {
+        if (chatId) {
+            router.push(`/doctor/video-call?receiverId=${chatId}`);
+        } else {
+            setShowConnectWallet(true);
+            console.error('User ID is not available');
+        }
+    };
+
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
             <div className='flex mt-2 justify-between items-center'>
@@ -348,7 +386,7 @@ function Chat() {
                         </div>
                     </div>
                 </div>
-                <Image src={VideoIcon} alt='video call' className='w-6 h-6' />
+                <Image src={VideoIcon}  onClick={handleVideoCallClick} alt='video call' className='w-6 h-6' />
             </div>
             <div>
                 <h3 className='text-center bg-doc-bg w-14 h-6 flex justify-center items-center p-2 text-sm mx-auto mt-2 rounded-lg'>Today</h3>
@@ -357,7 +395,7 @@ function Chat() {
                         <p className={`${msg.sender === publicKey?.toString() ? 'bg-chat-blue text-white rounded-br-none' : 'bg-doc-bg text-black rounded-bl-none'} py-2 px-4 max-w-full rounded-lg`}>
                             {msg.content}
                         </p>
-                        <p className='text-xs text-dark-grey'>{new Date(msg.timestamp).toLocaleTimeString()}</p>
+                        <p className='text-xs text-dark-grey'>{msg.formattedTime}</p>
                     </div>
                 ))}
             </div>
