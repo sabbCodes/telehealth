@@ -389,6 +389,7 @@ function Chat() {
                 <Image src={VideoIcon}  onClick={handleVideoCallClick} alt='video call' className='w-6 h-6' />
             </div>
             <div>
+                <p className='text-sm text-center italic mt-1'>Messages are end-to-end eencrypted</p>
                 <h3 className='text-center bg-doc-bg w-14 h-6 flex justify-center items-center p-2 text-sm mx-auto mt-2 rounded-lg'>Today</h3>
                 {decryptedMessages.map((msg, index) => (
                     <div key={index} className={`flex flex-col  w-3/4 ${msg.sender === publicKey?.toString() ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
