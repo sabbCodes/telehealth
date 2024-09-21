@@ -252,7 +252,7 @@ function VideoCallComponent() {
       <video ref={remoteVideoRef} className="remote-video" autoPlay playsInline></video>
       <video ref={webcamVideoRef} className="local-video" autoPlay playsInline muted></video>
       <div className="controls">
-        <div className='rounded-full bg-red-500 w-12 h-12 flex justify-center items-center outline-none' onClick={hangup}>
+        <div className='rounded-full bg-red-600 w-12 h-12 flex justify-center items-center outline-none' onClick={hangup}>
           <Image src={CallIcon} alt="hang up call" />
         </div>
       </div>
