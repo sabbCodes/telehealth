@@ -7,6 +7,8 @@ import './videocall.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PopupWallet from '@/app/components/PopupWallet';
+import Image from 'next/image';
+import CallIcon from '@/public/call.svg';
 
 const servers = {
   iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }],
@@ -247,7 +249,9 @@ function VideoCallComponent() {
       <video ref={remoteVideoRef} className="remote-video" autoPlay playsInline></video>
       <video ref={webcamVideoRef} className="local-video" autoPlay playsInline muted></video>
       <div className="controls">
-        <button className='text-center rounded-full bg-red-500 mb-2 p-2 text-2xl w-4 h-4 text-white outline-none' onClick={hangup}>X</button>
+        <div className='rounded-full bg-red-500 w-12 h-12 flex justify-center items-center outline-none' onClick={hangup}>
+          <Image src={CallIcon} alt="hang up call" />
+        </div>
       </div>
       {showConnectWallet && (
         <PopupWallet onClose={() => setShowConnectWallet(false)} />
