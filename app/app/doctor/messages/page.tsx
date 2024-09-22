@@ -17,7 +17,7 @@ function Messages() {
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border bg-white">
             <div className='flex mt-2 gap-2 items-center'>
-                <Link href='/userHome'>
+                <Link href='/doctor/userHome'>
                     <Image src={ArrowLeft} alt='back icon' />
                 </Link>
                 <h1 className="text-custom-black font-jakarta font-semibold text-xl">Conversations</h1>
