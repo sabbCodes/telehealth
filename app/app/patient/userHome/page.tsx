@@ -162,8 +162,8 @@ function Home() {
                     <h2 className="text-custom-black font-jakarta font-semibold text-xl">Upcoming Schedule</h2>
                     <p className="text-custom-blue text-base">View All</p>
                 </div>
-                {/* <div>
-                    <div className='w-full bg-schedule-col rounded-lg text-white p-4 my-2 z-50'>
+                <div>
+                    <div className='w-full bg-schedule-col rounded-lg text-white p-4 my-2 z-1'>
                         <div className='flex justify-between items-center'>
                             <div className='flex gap-2'>
                                 <Image src={DocImg} alt='doctor profile image' className='w-10 h-10' />
@@ -188,42 +188,9 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className='w-11/12 h-11 z-10 bg-card-layer2 m-auto relative bottom-9 rounded-lg'></div>
-                    <div className='w-10/12 h-11 -z-0 bg-card-layer3 m-auto relative bottom-16 rounded-lg'></div>
-                </div> */}
-                <div className="relative w-full pt-8 pb-16"> {/* Added padding to accommodate layers */}
-      <div className="absolute inset-x-0 top-8 bottom-0">
-        <div className='w-11/12 h-11 bg-card-layer2 mx-auto rounded-lg'></div>
-      </div>
-      <div className="absolute inset-x-0 top-16 bottom-0">
-        <div className='w-10/12 h-11 bg-card-layer3 mx-auto rounded-lg'></div>
-      </div>
-      <div className='relative w-full bg-schedule-col rounded-lg text-white p-4 z-10'>
-        <div className='flex justify-between items-center'>
-          <div className='flex gap-2'>
-            <Image src={DocImg} alt='doctor profile image' width={40} height={40} />
-            <div className='leading-none'>
-              <p className='font-semibold font-jakarta text-base m-0'>Dr. Sarafa Abbas</p>
-              <p className='leading-none text-sm m-0 p-0'>Neurosurgeon</p>
-            </div>
-          </div>
-          <div className='flex gap-2'>
-            <Image src={VidIcon} alt='video icon' width={24} height={24} />
-            <Image src={ChatIcon} alt='chat icon' width={24} height={24} />
-          </div>
-        </div>
-        <div className='text-black text-xs flex justify-between items-center bg-schedule-col-inner mt-2 p-4 rounded-xl'>
-          <div className='flex items-center gap-1'>
-            <Image src={DateIcon} alt='calendar icon' width={16} height={16} />
-            <p>Sunday, April 19</p>
-          </div>
-          <div className='flex items-center gap-1'>
-            <Image src={TimeIcon} alt='clock icon' width={16} height={16} />
-            <p>8:00 AM - 9:00 AM</p>
-          </div>
-        </div>
-      </div>
-    </div>
+                    <div className='w-11/12 h-11 -z-10 bg-card-layer2 m-auto relative bottom-9 rounded-lg'></div>
+                    <div className='w-10/12 h-11 -z-20 bg-card-layer3 m-auto relative bottom-16 rounded-lg'></div>
+                </div>
             </div>
             <footer className='flex items-center h-14 shadow-3xl w-screen m-0 fixed right-0 left-0 bottom-0 bg-white'>
                 <nav className='w-full flex gap-14 justify-evenly items-center py-4 px-14'>
