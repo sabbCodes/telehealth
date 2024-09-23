@@ -364,7 +364,7 @@ function Chat() {
 
     const handleVideoCallClick = () => {
         if (chatId) {
-            router.push(`/doctor/video-call?receiverId=${chatId}`);
+            router.push(`/patient/video-call?receiverId=${chatId}`);
         } else {
             setShowConnectWallet(true);
             console.error('User ID is not available');

@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 // import React, { useEffect, useState, useRef, Suspense } from 'react';
 // import { collection, onSnapshot, addDoc, updateDoc, query, where } from 'firebase/firestore';
@@ -208,44 +208,44 @@
 //     }
 //   };
 
-  // const hangup = () => {
-  //   // Close peer connection
-  //   if (pc) {
-  //     pc.onicecandidate = null;
-  //     pc.ontrack = null;
-  //     pc.close();
-  //     setPc(null);
-  //   }
+//   const hangup = () => {
+//     // Close peer connection
+//     if (pc) {
+//       pc.onicecandidate = null;
+//       pc.ontrack = null;
+//       pc.close();
+//       setPc(null);
+//     }
 
-  //   // Stop all tracks on local stream
-  //   if (localStream) {
-  //     localStream.getTracks().forEach(track => {
-  //       track.stop();
-  //     });
-  //     setLocalStream(null);
-  //   }
+//     // Stop all tracks on local stream
+//     if (localStream) {
+//       localStream.getTracks().forEach(track => {
+//         track.stop();
+//       });
+//       setLocalStream(null);
+//     }
 
-  //   // Stop all tracks on remote stream
-  //   if (remoteStream) {
-  //     remoteStream.getTracks().forEach(track => {
-  //       track.stop();
-  //     });
-  //     setRemoteStream(null);
-  //   }
+//     // Stop all tracks on remote stream
+//     if (remoteStream) {
+//       remoteStream.getTracks().forEach(track => {
+//         track.stop();
+//       });
+//       setRemoteStream(null);
+//     }
 
-  //   // Reset video elements
-  //   if (webcamVideoRef.current) {
-  //     webcamVideoRef.current.srcObject = null;
-  //   }
-  //   if (remoteVideoRef.current) {
-  //     remoteVideoRef.current.srcObject = null;
-  //   }
+//     // Reset video elements
+//     if (webcamVideoRef.current) {
+//       webcamVideoRef.current.srcObject = null;
+//     }
+//     if (remoteVideoRef.current) {
+//       remoteVideoRef.current.srcObject = null;
+//     }
 
-  //   // TODO: Update call status in Firestore (if needed)
-  //   // await updateDoc(callDocRef, { status: 'ended' });
+//     // TODO: Update call status in Firestore (if needed)
+//     // await updateDoc(callDocRef, { status: 'ended' });
 
-  //   router.push(`/doctor/messages/${receiverId}`);
-  // };
+//     router.push(`/doctor/messages/${receiverId}`);
+//   };
 
 //   return (
 //     <div className="video-call-container">
@@ -275,9 +275,10 @@
 
 
 
+"use client";
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { collection, onSnapshot, addDoc, updateDoc, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/app/components/firebase-config';
 import './videocall.css';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -303,6 +304,11 @@ function VideoCallComponent() {
   const searchParams = useSearchParams();
   const receiverId = searchParams.get('receiverId');
   const router = useRouter();
+
+  // Generate session ID based on userId and receiverId
+  const generateSessionId = (user1: string, user2: string) => {
+    return [user1, user2].sort().join('_');
+  };
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
@@ -339,10 +345,11 @@ function VideoCallComponent() {
   useEffect(() => {
     if (pc && userId && receiverId) {
       startWebcam().then(() => {
+        const sessionId = generateSessionId(userId, receiverId);
         if (userId < receiverId) {
-          createCall();
+          createCall(sessionId);
         } else {
-          listenForIncomingCall();
+          listenForIncomingCall(sessionId);
         }
       });
     }
@@ -354,23 +361,17 @@ function VideoCallComponent() {
     stream.getTracks().forEach(track => pc?.addTrack(track, stream));
   };
 
-  const generateSessionId = (userId: string, receiverId: string) => {
-    return [userId, receiverId].sort().join('_');
-  };
-
-  const createCall = async () => {
-    if (!pc || !userId || !receiverId) {
-      console.error("RTCPeerConnection, userId, or receiverId is not initialized");
+  const createCall = async (sessionId: string) => {
+    if (!pc || !userId) {
       return;
     }
 
     try {
-      const sessionId = generateSessionId(userId, receiverId);
       const callDoc = await addDoc(collection(db, 'calls'), {
-        sessionId,
+        sessionId: sessionId,
         callerId: userId,
         receiverId: receiverId,
-        status: 'creating'
+        status: 'creating',
       });
 
       pc.onicecandidate = (event) => {
@@ -412,10 +413,9 @@ function VideoCallComponent() {
     }
   };
 
-  const listenForIncomingCall = async () => {
-    if (!pc || !userId || !receiverId) return;
+  const listenForIncomingCall = async (sessionId: string) => {
+    if (!pc || !userId) return;
 
-    const sessionId = generateSessionId(userId, receiverId);
     const q = query(
       collection(db, 'calls'),
       where('sessionId', '==', sessionId),
@@ -432,16 +432,7 @@ function VideoCallComponent() {
   };
 
   const answerCall = async (callDoc: any) => {
-    if (!pc || !userId || !receiverId) {
-      console.error("RTCPeerConnection, userId, or receiverId is not initialized");
-      return;
-    }
-
-    const callData = callDoc.data();
-    if (callData.callerId !== receiverId || callData.receiverId !== userId) {
-      console.error("Mismatched caller or receiver ID");
-      return;
-    }
+    if (!pc) return;
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
@@ -450,14 +441,10 @@ function VideoCallComponent() {
     };
 
     try {
-      if (!callData || !callData.offer) {
-        console.error("Invalid call data or missing offer");
-        return;
-      }
-
+      const callData = callDoc.data();
       const offerDescription = callData.offer;
+
       if (!offerDescription || !offerDescription.type || !offerDescription.sdp) {
-        console.error("Invalid offer description");
         return;
       }
 
@@ -488,7 +475,6 @@ function VideoCallComponent() {
   };
 
   const hangup = () => {
-    // Close peer connection
     if (pc) {
       pc.onicecandidate = null;
       pc.ontrack = null;
@@ -496,32 +482,22 @@ function VideoCallComponent() {
       setPc(null);
     }
 
-    // Stop all tracks on local stream
     if (localStream) {
-      localStream.getTracks().forEach(track => {
-        track.stop();
-      });
+      localStream.getTracks().forEach(track => track.stop());
       setLocalStream(null);
     }
 
-    // Stop all tracks on remote stream
     if (remoteStream) {
-      remoteStream.getTracks().forEach(track => {
-        track.stop();
-      });
+      remoteStream.getTracks().forEach(track => track.stop());
       setRemoteStream(null);
     }
 
-    // Reset video elements
     if (webcamVideoRef.current) {
       webcamVideoRef.current.srcObject = null;
     }
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
     }
-
-    // TODO: Update call status in Firestore (if needed)
-    // await updateDoc(callDocRef, { status: 'ended' });
 
     router.push(`/doctor/messages/${receiverId}`);
   };
