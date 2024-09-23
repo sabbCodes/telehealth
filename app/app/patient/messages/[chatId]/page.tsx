@@ -247,6 +247,32 @@ function Chat() {
         });
     };
 
+    const storeSentMessageLocally = (message: string, recipientPublicKey: string, timestamp: number) => {
+        const sentMessages = JSON.parse(localStorage.getItem('sentMessages') || '[]');
+        sentMessages.push({ message, recipientPublicKey, timestamp });
+        localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+    };
+
+    const loadSentMessages = (recipientPublicKey: string) => {
+        const sentMessages = JSON.parse(localStorage.getItem('sentMessages') || '[]');
+        return sentMessages.filter((msg: any) => msg.recipientPublicKey === recipientPublicKey);
+    };
+
+    useEffect(() => {
+        if (otherPublicKey) {
+          const storedMessages = loadSentMessages(otherPublicKey);
+          setDecryptedMessages((prevMessages) => [
+            ...prevMessages,
+            ...storedMessages.map((msg: any) => ({
+              content: msg.message,
+              sender: publicKey,
+              timestamp: msg.timestamp,
+              formattedTime: formatTimestamp(msg.timestamp),
+            })),
+          ]);
+        }
+    }, [otherPublicKey]);
+
     const handleSend = async () => {
         if (!otherPublicKey || !message.trim() || !chatKeyPair) return;
 
@@ -266,6 +292,9 @@ function Chat() {
                     message: encryptedMessage,
                     timestamp,
                 });
+
+                // Store the plaintext message locally
+                storeSentMessageLocally(message, otherPublicKey, timestamp);
 
                 // Directly add the plain text message to the decryptedMessages array
                 setDecryptedMessages((prevMessages) => [
