@@ -27,8 +27,8 @@ function SignUp() {
             <Image src={DocsNPatient} alt='Docs and a Patient' className='w-8/12 mt-16 mb-18 mx-auto' />
             <div className='w-full flex flex-col justify-center items-center mt-4 gap-2'>
                 <Link href='/signup/patientSignup' className="bg-custom-blue text-lg text-white font-semibold h-14 rounded-2xl flex justify-center items-center w-[91vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw]">I am a prospective Patient</Link>
-                {/* <Link href='/signup' onClick={handleClick} className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw]">I am a Doctor</Link> */}
-                <Link href='/signup/doctorSignUp' className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw]">I am a Doctor</Link>
+                <Link href='/signup' onClick={handleClick} className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw]">I am a Doctor</Link>
+                {/* <Link href='/signup/doctorSignUp' className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw]">I am a Doctor</Link> */}
             </div>
             <ToastContainer />
         </main>
