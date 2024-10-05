@@ -131,7 +131,7 @@ function Home() {
             <div>
                 <div className='w-full flex justify-between items-center'>
                     <h2 className="text-custom-black font-jakarta font-semibold text-xl">Doctors' List</h2>
-                    <Link href='/userHome/alldoctors' className="text-custom-blue text-base">View All</Link>
+                    <Link href='/patient/userHome/alldoctors' className="text-custom-blue text-base">View All</Link>
                 </div>
                 {doctors.map((doctor, index) => (
                     <div
