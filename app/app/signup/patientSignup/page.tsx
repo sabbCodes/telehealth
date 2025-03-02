@@ -368,21 +368,21 @@ function PatientSignUp() {
                     disabled={currentPage === 3 && !isCheckboxChecked}
                     className={`${
                         currentPage === 3 && !isCheckboxChecked ? 'bg-gray-400' : 'bg-custom-blue'
-                    } text-lg text-white font-semibold h-14 rounded-2xl flex justify-center items-center w-[91vw] sm:w-[80vw] md:w-[53vw] lg:w-[25vw]`}
+                    } text-lg text-white font-semibold h-14 rounded-2xl flex justify-center items-center w-full`}
                 >
                     {currentPage < 3 ? 'Next' : 'Submit'}
                 </button>
                 {currentPage > 1 ? (
                     <button
                         onClick={handleBack}
-                        className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[53vw] lg:w-[25vw]"
+                        className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-full"
                     >
                         Back
                     </button>
                 ) : (
                     <Link
                         href='/signup'
-                        className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[91vw] sm:w-[80vw] md:w-[53vw] lg:w-[25vw]"
+                        className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-full"
                     >
                         Back
                     </Link>

@@ -10,7 +10,7 @@ import MessagesInactive from '@/public/messages-inactive.svg';
 import ProfileInactive from '@/public/profileInactive.svg';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, doc, getDoc, DocumentReference, DocumentData } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { db } from '@/app/components/firebase-config';
 import PopupWallet from '@/app/components/PopupWallet';
@@ -141,7 +141,7 @@ function Home() {
     }
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
             <div className="w-full mt-3">
                 <div className="h-16 w-full flex justify-between items-center">
                     <div>
@@ -211,7 +211,7 @@ function Home() {
                     </Link>
                 </div>
             </div>
-            <footer className='flex items-center h-14 shadow-3xl w-screen m-0 fixed right-0 left-0 bottom-0 bg-white'>
+            <footer className='w-full sm:max-w-lg sm:mx-auto fixed bottom-0 left-0 right-0 shadow-3xl bg-white'>
                 <nav className='w-full flex gap-14 justify-evenly items-center py-4 px-14'>
                     <Link href='/doctor/docHome'>
                         <Image src={HomeActive} alt='home icon' />

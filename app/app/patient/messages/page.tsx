@@ -15,7 +15,7 @@ function Messages() {
     const [isMessages, setIsMessages] = useState(false);
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border bg-white">
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
             <div className='flex mt-2 gap-2 items-center'>
                 <Link href='/userHome'>
                     <Image src={ArrowLeft} alt='back icon' />
@@ -42,7 +42,7 @@ function Messages() {
                     </div>
                 </Link>
             )}
-            <footer className='flex items-center h-14 shadow-3xl w-screen m-0 fixed right-0 left-0 bottom-0 bg-white'>
+            <footer className='w-full sm:max-w-lg sm:mx-auto fixed bottom-0 left-0 right-0 shadow-3xl bg-white'>
                 <nav className='w-full flex gap-14 justify-evenly items-center py-4 px-14'>
                     <Link href='/patient/userHome'>
                         <Image src={HomeInactive} alt='home icon' />

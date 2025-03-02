@@ -18,6 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { auth, db } from '@/app/components/firebase-config';
 import { doc, getDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
+import DnaLoader from '@/app/components/DnaLoader';
 
 interface UserData {
     firstName: string;
@@ -98,7 +99,7 @@ function Home() {
     }, [user]);
 
     if (!userData) {
-        return <p>Loading...</p>;
+        return <DnaLoader />;
     }
 
     const formatWalletAddress = (address: string) => {
@@ -106,7 +107,7 @@ function Home() {
     };
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
             <div className="w-full mt-3">
                 <div className="h-16 w-full flex justify-between items-center">
                     <div>
@@ -192,7 +193,7 @@ function Home() {
                     <div className='w-10/12 h-11 -z-20 bg-card-layer3 m-auto relative bottom-16 rounded-lg'></div>
                 </div>
             </div>
-            <footer className='flex items-center h-14 shadow-3xl w-screen m-0 fixed right-0 left-0 bottom-0 bg-white'>
+            <footer className='w-full sm:max-w-lg sm:mx-auto fixed bottom-0 left-0 right-0 shadow-3xl bg-white'>
                 <nav className='w-full flex gap-14 justify-evenly items-center py-4 px-14'>
                     <Link href='/patient/userHome'>
                         <Image src={HomeActive} alt='home icon' />

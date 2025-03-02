@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AppWalletProvider from "./components/AppWalletProvider";
 import { ReactQueryProvider } from "./react-query-provider";
+import { AuthProvider } from "./context/AuthContext";
+import AuthObserver from "./AuthObserver";
 
 export const metadata: Metadata = {
   title: "teleHealthSol",
@@ -41,7 +43,10 @@ export default function RootLayout({
       <body>
         <ReactQueryProvider>
           <AppWalletProvider>
-            {children}
+            <AuthProvider>
+              <AuthObserver />
+              {children}
+            </AuthProvider>
           </AppWalletProvider>
         </ReactQueryProvider>
       </body>

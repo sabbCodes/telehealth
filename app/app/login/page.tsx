@@ -113,7 +113,7 @@ function Login() {
             <div className="w-full flex flex-col justify-center items-center gap-2">
                 <button
                     onClick={handleLogin}
-                    className={`bg-custom-blue text-lg text-white font-semibold mt-12 h-14 rounded-2xl w-[91vw] sm:w-[80vw] md:w-[51vw] lg:w-[25vw] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`bg-custom-blue text-lg text-white font-semibold mt-12 h-14 rounded-2xl w-full ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={loading}
                 >
                     {loading ? 'Logging in...' : 'Log In'}

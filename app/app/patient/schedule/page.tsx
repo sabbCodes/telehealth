@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { useWallet } from '@solana/wallet-adapter-react'; // Assuming you're using Solana wallet adapter
-import DocImg from '@/public/Frame 75.svg';
-import DateIcon from '@/public/story.svg';
-import TimeIcon from '@/public/clock.svg';
-import ArrowLeft from '@/public/arrow-left.svg';
-import Add from '@/public/add.svg';
-import Link from 'next/link';
-import { db } from '@/app/components/firebase-config';
-import PopupWallet from '@/app/components/PopupWallet';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useWallet } from "@solana/wallet-adapter-react";
+import DocImg from "@/public/Frame 75.svg";
+import DateIcon from "@/public/story.svg";
+import TimeIcon from "@/public/clock.svg";
+import ArrowLeft from "@/public/arrow-left.svg";
+import Add from "@/public/add.svg";
+import Link from "next/link";
+import { db } from "@/app/components/firebase-config";
+import { useRouter } from "next/navigation";
+import DnaLoader from "@/app/components/DnaLoader";
 
 interface Booking {
     date: string;
@@ -28,122 +28,168 @@ interface Doctor {
     [key: string]: any;
 }
 
+interface User {
+    walletAddress: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    [key: string]: any;
+}
+
 function Schedule() {
     const { publicKey } = useWallet();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showConnectWallet, setShowConnectWallet] = useState(false);
+    const [userData, setUserData] = useState<User | null>(null);
     const router = useRouter();
 
-    useEffect(() => {
-        if (!publicKey) {
-            setShowConnectWallet(true);
-        };
-    }, [publicKey]);
-
+    // Fetch logged-in user data
     useEffect(() => {
         if (!publicKey) return;
+
+        const fetchUserData = async () => {
+            try {
+                const usersRef = collection(db, "users");
+                const q = query(
+                    usersRef,
+                    where("walletAddress", "==", publicKey.toString())
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data() as User;
+                    setUserData(userData);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [publicKey]);
+
+    // Fetch bookings
+    useEffect(() => {
+        if (!userData) return;
 
         const fetchBookingsWithDoctors = async () => {
             setLoading(true);
             try {
-                const bookingsRef = collection(db, 'bookings');
-                const q = query(bookingsRef, where('userId', '==', publicKey.toString()));
+                const bookingsRef = collection(db, "bookings");
+                const q = query(
+                    bookingsRef,
+                    where("userId", "==", userData.walletAddress)
+                );
                 const querySnapshot = await getDocs(q);
 
                 const bookingsData = await Promise.all(
                     querySnapshot.docs.map(async (docSnapshot) => {
-                        const bookingData = docSnapshot.data() as Booking; // Cast as Booking type
+                        const bookingData = docSnapshot.data() as Booking;
 
-                        // Fetch doctor details from "users" collection using doctorId
-                        const usersRef = collection(db, 'users');
-                        const userQuery = query(usersRef, where('walletAddress', '==', bookingData.doctorId));
+                        // Fetch doctor details
+                        const usersRef = collection(db, "users");
+                        const userQuery = query(
+                            usersRef,
+                            where("walletAddress", "==", bookingData.doctorId)
+                        );
                         const userSnapshot = await getDocs(userQuery);
 
                         let doctorData: Doctor | null = null;
                         if (!userSnapshot.empty) {
-                            const userData = userSnapshot.docs[0].data() as Doctor; // Get the first matched document
+                            const userData = userSnapshot.docs[0].data() as Doctor;
                             doctorData = {
                                 name: `Dr. ${userData.firstName} ${userData.lastName}`,
                                 specialization: userData.specialization,
                             };
                         }
 
-                        return {
-                            ...bookingData, // Spread booking data (date, doctorId, etc.)
-                            doctor: doctorData // Add doctor details
-                        };
+                        return { ...bookingData, doctor: doctorData };
                     })
                 );
 
                 setBookings(bookingsData);
             } catch (error) {
-                console.error('Error fetching bookings:', error);
+                console.error("Error fetching bookings:", error);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchBookingsWithDoctors();
-    }, [publicKey]);
+    }, [userData]);
 
     const handleDoctorClick = (doctorId: string) => {
         router.push(`/patient/messages/${doctorId}`);
     };
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
-            <div className='mt-2 flex justify-between w-full'>
-                <div className='flex gap-3 items-center'>
-                    <Link href='/userHome'>
-                        <Image src={ArrowLeft} alt='back icon' />
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
+            <div className="mt-2 flex justify-between w-full">
+                <div className="flex gap-3 items-center">
+                    <Link href="/patient/userHome">
+                        <Image src={ArrowLeft} alt="back icon" />
                     </Link>
-                    <h1 className='font-jakarta font-semibold text-xl'>Schedule</h1>
+                    <h1 className="font-jakarta font-semibold text-xl">Schedule</h1>
                 </div>
-                <Image src={Add} alt='add icon' />
+                <Image src={Add} alt="add icon" />
             </div>
-            <ul className='flex w-full justify-between my-2 h-11 items-center bg-custom-schedule rounded-full py-1 px-4'>
-                <li className='py-1 px-3 bg-active-nav rounded-xl leading-none text-white'>Upcoming</li>
+            <ul className="flex w-full justify-between my-2 h-11 items-center bg-custom-schedule rounded-full py-1 px-4">
+                <li className="py-1 px-3 bg-active-nav rounded-xl leading-none text-white">
+                    Upcoming
+                </li>
                 <li>Completed</li>
                 <li>Cancelled</li>
             </ul>
 
-            <div className='pb-14'>
-                {bookings.length === 0 ? (
+            <div className="pb-14">
+                {loading ? (
+                    <DnaLoader />
+                ) : bookings.length === 0 ? (
                     <p>No upcoming appointments</p>
                 ) : (
                     bookings.map((booking, index) => (
-                        <div key={index} className='w-full bg-custom-schedule rounded-xl p-3 mb-2' onClick={() => handleDoctorClick(booking.doctorId)}>
-                            <div className='flex gap-2'>
-                                <Image src={DocImg} alt='doctor profile image' className='w-10 h-10' />
-                                <div className='leading-none'>
-                                    <p className='text-custom-black font-semibold text-base m-0'>
+                        <div
+                            key={index}
+                            className="w-full bg-custom-schedule rounded-xl p-3 mb-2"
+                            onClick={() => handleDoctorClick(booking.doctorId)}
+                        >
+                            <div className="flex gap-2">
+                                <Image
+                                    src={DocImg}
+                                    alt="doctor profile image"
+                                    className="w-10 h-10"
+                                />
+                                <div className="leading-none">
+                                    <p className="text-custom-black font-semibold text-base m-0">
                                         {booking.doctor?.name}
                                     </p>
-                                    <p className='leading-none text-sm m-0 p-0'>{booking.doctor?.specialization}</p>
+                                    <p className="leading-none text-sm m-0 p-0">
+                                        {booking.doctor?.specialization}
+                                    </p>
                                 </div>
                             </div>
-                            <div className='text-black text-xs flex justify-between items-center bg-schedule-col-inner mt-2 p-4 rounded-xl'>
-                                <div className='flex items-center gap-1'>
-                                    <Image src={DateIcon} alt='calendar icon' />
+                            <div className="text-black text-xs flex justify-between items-center bg-schedule-col-inner mt-2 p-4 rounded-xl">
+                                <div className="flex items-center gap-1">
+                                    <Image src={DateIcon} alt="calendar icon" />
                                     <p>{booking.date}</p>
                                 </div>
-                                <div className='flex items-center gap-1'>
-                                    <Image src={TimeIcon} alt='clock icon' />
+                                <div className="flex items-center gap-1">
+                                    <Image src={TimeIcon} alt="clock icon" />
                                     <p>{booking.time}</p>
                                 </div>
                             </div>
-                            <div className='w-full mt-2 flex justify-between h-10'>
-                                <button className='bg-none border-custom-blue border text-custom-blue h-full p-3 rounded-2xl flex items-center w-36 justify-center'>Cancel</button>
-                                <button className='bg-schedule-col text-white h-full p-3 rounded-2xl flex items-center w-36 justify-center'>Reschedule</button>
+                            <div className="w-full mt-2 flex justify-between h-10">
+                                <button className="bg-none border-custom-blue border text-custom-blue h-full p-3 rounded-2xl flex items-center w-36 justify-center">
+                                    Cancel
+                                </button>
+                                <button className="bg-schedule-col text-white h-full p-3 rounded-2xl flex items-center w-36 justify-center">
+                                    Reschedule
+                                </button>
                             </div>
                         </div>
                     ))
                 )}
             </div>
-            {showConnectWallet && (
-                <PopupWallet onClose={() => setShowConnectWallet(false)} />
-            )}
         </main>
     );
 }

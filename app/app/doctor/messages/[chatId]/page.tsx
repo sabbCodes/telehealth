@@ -86,9 +86,9 @@ function Chat() {
 
     useEffect(() => {
         if (wallet.connected && wallet.publicKey) {
-          userId = wallet.publicKey.toString();
+            userId = wallet.publicKey.toString();
         } else {
-          setShowConnectWallet(true);
+            setShowConnectWallet(true);
         }
     }, [wallet]);
 
@@ -109,8 +109,8 @@ function Chat() {
     // 2. Key Exchange
     const exportPublicKey = async (keyPair: CryptoKeyPair): Promise<string> => {
         const exportedKey = await crypto.subtle.exportKey(
-          "spki",
-          keyPair.publicKey
+            "spki",
+            keyPair.publicKey
         );
         const exportedKeyArray = Array.from(new Uint8Array(exportedKey));
         return btoa(String.fromCharCode.apply(null, exportedKeyArray));
@@ -292,16 +292,16 @@ function Chat() {
 
     useEffect(() => {
         if (otherPublicKey) {
-          const storedMessages = loadSentMessages(otherPublicKey);
-          setDecryptedMessages((prevMessages) => [
-            ...prevMessages,
-            ...storedMessages.map((msg: any) => ({
-              content: msg.message,
-              sender: publicKey,
-              timestamp: msg.timestamp,
-              formattedTime: formatTimestamp(msg.timestamp),
-            })),
-          ]);
+            const storedMessages = loadSentMessages(otherPublicKey);
+            setDecryptedMessages((prevMessages) => [
+                ...prevMessages,
+                ...storedMessages.map((msg: any) => ({
+                    content: msg.message,
+                    sender: publicKey,
+                    timestamp: msg.timestamp,
+                    formattedTime: formatTimestamp(msg.timestamp),
+                })),
+            ]);
         }
     }, [otherPublicKey]);
 
@@ -523,7 +523,7 @@ function Chat() {
     };
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
             <div className='flex mt-2 justify-between items-center'>
                 <div className='flex gap-3 items-center'>
                     <Link href='/doctor/messages'>

@@ -9,6 +9,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import PopupWallet from '@/app/components/PopupWallet';
 import Image from 'next/image';
 import CallIcon from '@/public/call.svg';
+import DnaLoader from '@/app/components/DnaLoader';
 
 const servers = {
   iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }],
@@ -243,7 +244,7 @@ function VideoCallComponent() {
 
 export default function VideoCall() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<DnaLoader />}>
       <VideoCallComponent />
     </Suspense>
   );
