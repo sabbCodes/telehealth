@@ -138,7 +138,7 @@ function Home() {
                     <div
                         key={index}
                         onClick={() => handleDoctorClick(doctor.walletAddress)}
-                        className='flex justify-between items-center h-14 bg-doc-bg rounded-lg p-2 mb-2'
+                        className='flex justify-between items-center h-14 bg-doc-bg rounded-lg p-2 mb-2 cursor-pointer'
                     >
                         <div className='flex gap-2'>
                             <Image src={DocImg} alt='doctor profile image' className='w-10 h-10' />
@@ -161,7 +161,7 @@ function Home() {
             <div>
                 <div className='flex justify-between items-center'>
                     <h2 className="text-custom-black font-jakarta font-semibold text-xl">Upcoming Schedule</h2>
-                    <p className="text-custom-blue text-base">View All</p>
+                    <Link className="text-custom-blue text-base" href='./patient/schedule'>View All</Link>
                 </div>
                 <div>
                     <div className='w-full bg-schedule-col rounded-lg text-white p-4 my-2 z-1'>

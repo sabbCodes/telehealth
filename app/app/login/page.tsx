@@ -63,7 +63,7 @@ function Login() {
 
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
-            <Image src={Logo} alt="logo" className="w-4/12 h-20 mt-16 mx-auto" />
+            <Image src={Logo} alt="logo" className="w-4/12 h-38 mt-16 mx-auto" />
             <h2 className="text-custom-grey text-xl font-semibold mt-8 mb-4">Continue with your Email</h2>
             <div className="mb-4">
                 <label className="text-custom-grey block mb-2">

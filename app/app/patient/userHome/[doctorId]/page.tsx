@@ -21,6 +21,9 @@ import { LAMPORTS_PER_SOL, Transaction, SystemProgram } from '@solana/web3.js';
 import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { format } from 'date-fns';
 import PopupWallet from '@/app/components/PopupWallet';
+import DnaLoader from '@/app/components/DnaLoader';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 interface DoctorDetails {
     firstName: string;
@@ -89,12 +92,12 @@ function DocDetails() {
 
     const handleBooking = async () => {
         if (!selectedDate || !selectedTime) {
-            alert('Please select a date and time');
+            toast.warn('Please select a date and time');
             return;
         }
 
         if (!wallet || !wallet.connected || !wallet.signTransaction) {
-            alert('Please connect your wallet to proceed with the payment.');
+            toast.warn('Please connect your wallet to proceed with the payment.');
             setShowPopup(true);
             return;
         }
@@ -111,7 +114,7 @@ function DocDetails() {
             const balance = await connection.getBalance(wallet.publicKey!);
 
             if (balance < consultationFeeInSol * LAMPORTS_PER_SOL) {
-                alert('Insufficient balance to complete the transaction.');
+                toast.warn('Insufficient balance to complete the transaction.');
                 return;
             }
 
@@ -144,10 +147,10 @@ function DocDetails() {
             await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
 
             await saveBookingToDatabase();
-            alert(`Session booked successfully! Signature: ${signature}`);
+            toast.success(`Session booked successfully! Signature: ${signature}`);
         } catch (error) {
             console.error('Payment failed:', error);
-            alert('Payment failed. Please try again.');
+            toast.error('Payment failed. Please try again.');
         }
     };
 
@@ -171,7 +174,7 @@ function DocDetails() {
     };
 
     if (!doctorDetails) {
-        return <p>Loading...</p>;
+        return <DnaLoader />;
     }
 
     return (
@@ -245,18 +248,18 @@ function DocDetails() {
             <article className='mt-2'>
                 <h2 className='font-jakarta font-semibold text-xl'>MODE OF CONSULTATION</h2>
                 <div className='flex gap-3 justify-center mt-2'>
-                    <div className='flex border border-custom-blue text-custom-blue items-center w-32 h-9 rounded-2xl justify-center gap-1'>
+                    <div className='flex border border-custom-blue text-custom-blue items-center w-32 h-9 rounded-2xl justify-center gap-1 cursor-pointer'>
                         <p>Video</p>
                         <Image src={VideoIcon} alt='video icon' />
                     </div>
-                    <div className='flex border border-custom-blue text-custom-blue items-center w-32 h-9 rounded-2xl justify-center gap-1'>
+                    <div className='flex border border-custom-blue text-custom-blue items-center w-32 h-9 rounded-2xl justify-center gap-1 cursor-pointer'>
                         <p>Chat</p>
                         <Image src={ChatIcon} alt='chat icon' />
                     </div>
                 </div>
             </article>
             <article className='mt-6 pb-16'>
-                <h2 className='font-jakarta font-medium text-lg'>CONSULTATION FEE: {doctorDetails.consultationFee} Sol</h2>
+                <h2 className='font-jakarta font-medium text-lg'>CONSULTATION FEE: {doctorDetails.consultationFee} USDC</h2>
                 <button
                     onClick={handleBooking}
                     className='mt-2 w-full h-14 flex gap-2 text-xl font-medium outline-none bg-schedule-col rounded-lg justify-center items-center text-white'
@@ -282,6 +285,7 @@ function DocDetails() {
                 </nav>
             </footer>
             {showPopup && <PopupWallet onClose={() => setShowPopup(false)} />}
+            <ToastContainer />
         </main>
     );
 }

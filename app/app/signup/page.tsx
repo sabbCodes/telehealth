@@ -10,12 +10,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function SignUp() {
     const handleClick = () => {
-        toast.info("Uh uh! Can't do that right now! Ain't that easy Dawg...")
+        toast.info("We're currently not accepting Doctors at the moment. Kindly check back later.")
     }
 
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
-            <Image src={Logo} alt='logo' className='w-4/12 h-20 mt-16 mx-auto' />
+            <Image src={Logo} alt='logo' className='w-4/12 h-38 mt-16 mx-auto' />
             <div className='flex flex-col justify-center align-center w-full'>
                 <h1 className='font-jakarta font-bold mt-10 text-custom-blue text-xl text-center'>Health Care Brought Closer</h1>
                 <p className='text-custom-grey text-base text-center p-2'>

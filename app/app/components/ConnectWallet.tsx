@@ -31,8 +31,8 @@ function ConnectWallet() {
     };
 
     return (
-        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col pt-16 mb-0">
-            <Image src={Logo} alt="logo" className="w-4/12 h-20 mx-auto" />
+        <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col pt-10 mb-0">
+            <Image src={Logo} alt="logo" className="w-4/12 h-38 mx-auto" />
             <div className="flex flex-col justify-center align-center w-full">
                 <h1 className="font-jakarta font-bold mt-10 text-custom-blue text-xl text-center">
                     Health Care Brought Closer
