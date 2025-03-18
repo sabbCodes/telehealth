@@ -1,4 +1,4 @@
-import { db } from "@/app/components/firebase-config";
+import { db } from "@/app/components/libs/firebase-config";
 import { addDoc, collection } from "@firebase/firestore";
 import {
   ActionPostResponse,
@@ -84,7 +84,8 @@ export const GET = async (req: Request) => {
               ],
               required: true
             }
-          ]
+          ],
+          type: "transaction"
         }
       ]
     }
@@ -157,6 +158,7 @@ export const POST = async (req: Request) => {
 
   const payload: ActionPostResponse = await createPostResponse({
     fields: {
+      type: "transaction",
       transaction,
       message: `Booking confirmed with ${doctor} for ${date} at ${time}. You can head to teleHealthSol to have your session!`,
     },
