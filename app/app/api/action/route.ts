@@ -84,8 +84,7 @@ export const GET = async (req: Request) => {
               ],
               required: true
             }
-          ],
-          type: "transaction"
+          ]
         }
       ]
     }
