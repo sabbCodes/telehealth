@@ -14,7 +14,7 @@ import ChatIcon from '@/public/messages-3.svg';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { db } from '@/app/components/firebase-config';
+import { db } from "@/app/components/libs/firebase-config";
 import { useParams } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, Transaction, SystemProgram } from '@solana/web3.js';
@@ -22,8 +22,7 @@ import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { format } from 'date-fns';
 import PopupWallet from '@/app/components/PopupWallet';
 import DnaLoader from '@/app/components/DnaLoader';
-import { toast, ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from 'react-toastify';
 
 interface DoctorDetails {
     firstName: string;
@@ -285,7 +284,6 @@ function DocDetails() {
                 </nav>
             </footer>
             {showPopup && <PopupWallet onClose={() => setShowPopup(false)} />}
-            <ToastContainer />
         </main>
     );
 }

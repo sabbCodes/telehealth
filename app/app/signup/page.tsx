@@ -9,9 +9,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function SignUp() {
-    const handleClick = () => {
-        toast.info("We're currently not accepting Doctors at the moment. Kindly check back later.")
-    }
+    // const handleClick = () => {
+    //     toast.info("We're currently not accepting Doctors at the moment. Kindly check back later.")
+    // }
 
     return (
         <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen box-border">
@@ -27,8 +27,8 @@ function SignUp() {
             <Image src={DocsNPatient} alt='Docs and a Patient' className='w-8/12 mt-16 mb-18 mx-auto' />
             <div className='w-full flex flex-col justify-center items-center mt-4 gap-2'>
                 <Link href='/signup/patientSignup' className="bg-custom-blue text-lg text-white font-semibold h-14 rounded-2xl flex justify-center items-center w-[350px]">I am a prospective Patient</Link>
-                <Link href='/signup' onClick={handleClick} className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[350px]">I am a Doctor</Link>
-                {/* <Link href='/signup/doctorSignUp' className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[350px]">I am a Doctor</Link> */}
+                {/* <Link href='/signup' onClick={handleClick} className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[350px]">I am a Doctor</Link> */}
+                <Link href='/signup/doctorSignUp' className="bg-white text-lg text-custom-blue border flex justify-center items-center border-custom-blue font-semibold h-14 rounded-2xl p-0 w-[350px]">I am a Doctor</Link>
             </div>
             <ToastContainer />
         </main>

@@ -4,6 +4,8 @@ import AppWalletProvider from "./components/AppWalletProvider";
 import { ReactQueryProvider } from "./react-query-provider";
 import { AuthProvider } from "./context/AuthContext";
 import AuthObserver from "./AuthObserver";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "teleHealthSol",
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
     siteName: "teleHealthSol",
     images: [
       {
-        url: "https://telehealthsol.health/teleHealth.jpg",
+        url: "/teleHealth.jpg",
         width: 800,
         height: 600,
         alt: "teleHealthSol logo",
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "teleHealthSol",
     description: "Telemedicine app, built with love from Nigeria.",
-    images: ["https://telehealthsol.health/teleHealth.jpg"],
+    images: ["/teleHealth.jpg"],
     site: "@teleHealthS0l",
   },
 };
@@ -46,6 +48,7 @@ export default function RootLayout({
             <AuthProvider>
               <AuthObserver />
               {children}
+              <ToastContainer />
             </AuthProvider>
           </AppWalletProvider>
         </ReactQueryProvider>
