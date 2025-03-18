@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { db } from '@/app/components/firebase-config';
+import { db } from "@/app/components/libs/firebase-config";
 import PopupWallet from '@/app/components/PopupWallet';
 import { useRouter } from 'next/navigation';
 

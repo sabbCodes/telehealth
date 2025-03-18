@@ -11,7 +11,7 @@ import SendIcon from '@/public/send.svg';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { database, db } from '@/app/components/firebase-config';
+import { database, db } from '@/app/components/libs/firebase-config';
 import PatientDetailsPopup from '@/app/components/PatientDetailsPopup';
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, web3 } from '@coral-xyz/anchor';

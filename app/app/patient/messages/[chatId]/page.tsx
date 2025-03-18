@@ -11,7 +11,7 @@ import Attachment from '@/public/attachment.svg';
 import CameraIcon from '@/public/camera.svg';
 import MicrophoneIcon from '@/public/microphone-2.svg';
 import SendIcon from '@/public/send.svg';
-import { database, db } from '@/app/components/firebase-config';
+import { database, db } from "@/app/components/libs/firebase-config";
 import { addDoc, collection, getDocs, query, where } from '@firebase/firestore';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PopupWallet from '@/app/components/PopupWallet';
