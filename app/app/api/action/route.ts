@@ -158,7 +158,6 @@ export const POST = async (req: Request) => {
 
   const payload: ActionPostResponse = await createPostResponse({
     fields: {
-      type: "transaction",
       transaction,
       message: `Booking confirmed with ${doctor} for ${date} at ${time}. You can head to teleHealthSol to have your session!`,
     },
