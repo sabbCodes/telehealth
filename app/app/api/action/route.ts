@@ -1,4 +1,4 @@
-import { db } from "@/app/components/libs/firebase-config";
+import { db } from "@/app/components/utils/firebase-config";
 import { addDoc, collection } from "@firebase/firestore";
 import {
   ActionPostResponse,

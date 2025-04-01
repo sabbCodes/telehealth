@@ -4,89 +4,74 @@ declare_id!("H946v5ZdWCTBKb6Zyc6GXRmANSrKp1NaZFyT1QNC4UoL");
 
 #[program]
 pub mod tele_health {
-    use super::*;
+  use super::*;
 
-    pub fn enter_health_record(
-        ctx: Context<CreateEntry>,
-        patient_id: String,
-        signs_n_symptoms: String,
-        diagnosis: String,
-        prescription: String,
-    ) -> Result<()> {
-        if signs_n_symptoms.chars().count() > 500 {
-            return err!(EntryErrors::SNSTooLong);
-        }
-
-        if diagnosis.chars().count() > 500 {
-            return err!(EntryErrors::DiagnosistTooLong);
-        }
-
-        if prescription.chars().count() > 500 {
-            return err!(EntryErrors::PrescriptionTooLong);
-        }
-
-        let record_entry = &mut ctx.accounts.record_entry;
-
-        let time = Clock::get().unwrap();
-
-        record_entry.doctor = ctx.accounts.doctor.key();
-        record_entry.patient_id = patient_id;
-        record_entry.signs_n_symptoms = signs_n_symptoms;
-        record_entry.diagnosis = diagnosis;
-        record_entry.timestamp = time.unix_timestamp;
-        record_entry.prescription = prescription;
-        Ok(())
+  pub fn enter_health_record(
+    ctx: Context<CreateEntry>,
+    patient_id: String,
+    akave_cid: String,
+  ) -> Result<()> {
+    if patient_id.chars().count() > 44 { // Pubkey base58 length
+        return err!(EntryErrors::PatientIdTooLong);
     }
+
+    if akave_cid.chars().count() > 64 { // CIDv1 max length ~59, buffer to 64
+        return err!(EntryErrors::AkaveCidTooLong);
+    }
+
+    let record_entry = &mut ctx.accounts.record_entry;
+
+    let time = Clock::get().unwrap();
+
+    record_entry.doctor = ctx.accounts.doctor.key();
+    record_entry.patient_id = patient_id;
+    record_entry.timestamp = time.unix_timestamp;
+    record_entry.akave_cid = akave_cid;
+    Ok(())
+  }
 }
 
 #[error_code]
 pub enum EntryErrors {
-    #[msg("Signs ann symptoms should be less than 300 characters")]
-    SNSTooLong,
+  #[msg("Patient ID should be a valid Solana public key (max 44 chars)")]
+  PatientIdTooLong,
 
-    #[msg("Diagnosis shouldn't be more than 300 characters")]
-    DiagnosistTooLong,
-
-    #[msg("Prescription note too long")]
-    PrescriptionTooLong,
+  #[msg("Akave CID too long (max 64 chars)")]
+  AkaveCidTooLong,
 }
 
 #[account]
 pub struct RecordDetailsEntry {
-    pub doctor: Pubkey,
-    pub patient_id: String,
-    pub timestamp: i64,
-    pub signs_n_symptoms: String,
-    pub diagnosis: String,
-    pub prescription: String,
+  pub doctor: Pubkey,
+  pub patient_id: String,   // Base58 pubkey (e.g., patient’s wallet)
+  pub timestamp: i64,
+  pub akave_cid: String,    // CID from Akave upload
 }
 
 #[derive(Accounts)]
-pub struct CreateEntry<'a> {
+pub struct CreateEntry<'info> {
   #[account(
-    init,
-    payer = doctor,
-    space = RecordDetailsEntry::LEN
+      init,
+      payer = doctor,
+      space = RecordDetailsEntry::LEN
   )]
-  pub record_entry: Account<'a, RecordDetailsEntry>,
+  pub record_entry: Account<'info, RecordDetailsEntry>,
   #[account(mut)]
-  pub doctor: Signer<'a>,
-  pub system_program: Program<'a, System>,
+  pub doctor: Signer<'info>,
+  pub system_program: Program<'info, System>,
 }
 
 const DISCRIMINATOR: usize = 8;
 const PUBKEY_LENGTH: usize = 32;
 const TIMESTAMP_LENGTH: usize = 8;
-const SIGNSNSYMPTOMS_LENGTH: usize = 500 * 4;
-const DIAGNOSIS_LENGTH: usize = 500 * 4;
-const PRESCRIPTION_LENGTH: usize = 500 * 4;
 const STRING_PREFIX_LENGTH: usize = 4;
+const PATIENT_ID_LENGTH: usize = 44 * 4; // Base58 pubkey, UTF-8 encoded
+const AKAVE_CID_LENGTH: usize = 64 * 4;  // CIDv1, UTF-8 encoded
 
 impl RecordDetailsEntry {
-    const LEN: usize = DISCRIMINATOR +
-        PUBKEY_LENGTH + TIMESTAMP_LENGTH +
-        STRING_PREFIX_LENGTH + PUBKEY_LENGTH +
-        STRING_PREFIX_LENGTH + SIGNSNSYMPTOMS_LENGTH +
-        STRING_PREFIX_LENGTH + DIAGNOSIS_LENGTH +
-        STRING_PREFIX_LENGTH + PRESCRIPTION_LENGTH;
+  const LEN: usize = DISCRIMINATOR +
+    PUBKEY_LENGTH +                    // doctor
+    STRING_PREFIX_LENGTH + PATIENT_ID_LENGTH + // patient_id
+    TIMESTAMP_LENGTH +                 // timestamp
+    STRING_PREFIX_LENGTH + AKAVE_CID_LENGTH;  // akave_cid
 }

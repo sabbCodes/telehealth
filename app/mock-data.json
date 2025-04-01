@@ -1,0 +1,27 @@
+[
+  {
+    "signs_and_symptoms": "Fever, cough, shortness of breath",
+    "diagnosis": "Pneumonia",
+    "prescription": "Amoxicillin 500mg, Rest, Hydration"
+  },
+  {
+    "signs_and_symptoms": "Headache, nausea, sensitivity to light",
+    "diagnosis": "Migraine",
+    "prescription": "Ibuprofen 400mg, Dark room, Hydration"
+  },
+  {
+    "signs_and_symptoms": "Frequent urination, excessive thirst, fatigue",
+    "diagnosis": "Diabetes Mellitus",
+    "prescription": "Metformin 500mg, Diet control, Exercise"
+  },
+  {
+    "signs_and_symptoms": "Sore throat, runny nose, sneezing",
+    "diagnosis": "Common Cold",
+    "prescription": "Antihistamines, Rest, Warm fluids"
+  },
+  {
+    "signs_and_symptoms": "Chest pain, shortness of breath, sweating",
+    "diagnosis": "Heart Attack",
+    "prescription": "Aspirin, Emergency Care"
+  }
+]

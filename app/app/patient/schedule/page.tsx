@@ -17,7 +17,7 @@ import TimeIcon from "@/public/clock.svg";
 import ArrowLeft from "@/public/arrow-left.svg";
 import Add from "@/public/add.svg";
 import Link from "next/link";
-import { db } from "@/app/components/libs/firebase-config";
+import { db } from "@/app/components/utils/firebase-config";
 import { useRouter } from "next/navigation";
 import DnaLoader from "@/app/components/DnaLoader";
 import { toast } from "react-toastify";

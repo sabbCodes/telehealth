@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { collection, onSnapshot, addDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
-import { db } from "@/app/components/libs/firebase-config";
+import { db } from "@/app/components/utils/firebase-config";
 import './videocall.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';

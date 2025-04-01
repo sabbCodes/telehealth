@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "../../components/libs/firebase-config";
+import { auth, db } from "../../components/utils/firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import Logo from "@/public/logo.svg";
@@ -410,3 +410,6 @@ function PatientSignUp() {
 }
 
 export default PatientSignUp;
+
+
+// DO NOT FORGET NASTROMA!!!!!

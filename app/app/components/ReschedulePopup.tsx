@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/app/components/libs/firebase-config";
+import { db } from "@/app/components/utils/firebase-config";
 import { toast } from "react-toastify";
 
 interface ReschedulePopupProps {

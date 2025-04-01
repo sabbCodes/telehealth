@@ -16,3 +16,21 @@ app/.env.local
 app/.env.development.local
 app/.env.test.local
 app/.env.production.local
+
+# Virtual Environment
+backend-ml/venv/
+backend-ml/.venv/
+backend-ml/.env
+backend-ml/__pycache__/
+backend-ml/*.pyc
+backend-ml/*.pyo
+
+# Model files
+backend-ml/*.h5
+backend-ml/*.keras
+backend-ml/*.ckpt
+
+# Logs and system files
+backend-ml/*.log
+backend-ml/.DS_Store
+backend-ml/Thumbs.db

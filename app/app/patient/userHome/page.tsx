@@ -15,7 +15,7 @@ import MessagesInactive from '@/public/messages-inactive.svg';
 import ProfileInactive from '@/public/profileInactive.svg';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { auth, db } from "@/app/components/libs/firebase-config";
+import { auth, db } from "@/app/components/utils/firebase-config";
 import { doc, getDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import DnaLoader from '@/app/components/DnaLoader';

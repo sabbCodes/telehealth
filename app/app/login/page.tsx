@@ -7,7 +7,7 @@ import Eye from "@/public/eye.png";
 import EyeSlash from "@/public/eye-slash.png";
 import Link from "next/link";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../components/libs/firebase-config";
+import { auth, db } from "../components/utils/firebase-config";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 
