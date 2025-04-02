@@ -2,6 +2,8 @@
 
 You've reached the official Repo for [teleHealthSol](telehealthsol.health "teleHealthSol")
 
+![App flow](architecture.drawio.svg)
+
 Languages/Tools include;
 - Rust
 - Anchor
