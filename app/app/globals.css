@@ -15,3 +15,24 @@ body, html {
   overflow-x: hidden;
   /* background-color: white; */
 }
+
+/* Optional: Smooth dots loading animation */
+.dot-flash::after {
+  content: '● ● ●';
+  animation: flash 1s infinite;
+}
+
+@keyframes flash {
+  0% {
+    content: '●     ';
+  }
+  33% {
+    content: '● ●   ';
+  }
+  66% {
+    content: '● ● ●';
+  }
+  100% {
+    content: '●     ';
+  }
+}

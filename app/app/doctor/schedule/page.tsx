@@ -82,7 +82,7 @@ function Schedule() {
                     <Link href='/doctor/messages'>
                         <Image src={MessagesInactive} alt='Messages icon' />
                     </Link>
-                    <Link href='/doctor/userProfile'>
+                    <Link href='/doctor/doctorProfile'>
                         <Image src={ProfileInactive} alt='Profile icon' />
                     </Link>
                 </nav>

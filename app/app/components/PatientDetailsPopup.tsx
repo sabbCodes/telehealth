@@ -218,7 +218,7 @@ const PatientDetailsPopup: React.FC<PatientDetailsPopupProps> = ({
             {loading ? (
               <div className="flex flex-col justify-center items-center h-40">
                 <DnaLoader />
-                <p>Please wait...</p>
+                <p className="text-gray-700 italic">Please wait, do not close this page...</p>
               </div>
             ) : (
               <div>

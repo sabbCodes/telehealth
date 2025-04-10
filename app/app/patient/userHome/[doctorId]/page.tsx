@@ -33,6 +33,7 @@ interface DoctorDetails {
   about: string;
   consultationFee: number;
   walletAddress: string;
+  avatar: string;
 }
 
 function getWeekDays(startDate: Date) {
@@ -201,8 +202,8 @@ function DocDetails() {
           <Image src={ArrowLeft} alt="back icon" />
         </Link>
         <div className="flex flex-col items-center p-2">
-          <Image
-            src={DocImg}
+          <img
+            src={doctorDetails.avatar || DocImg}
             alt="doctor profile image"
             className="w-20 h-20"
           />

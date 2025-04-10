@@ -30,6 +30,7 @@ interface DoctorDetails {
   allergies: string;
   medicalHistory: string;
   walletAddress: string;
+  avatar: string;
 }
 
 function Chat() {
@@ -46,11 +47,11 @@ function Chat() {
   const { chatId } = useParams();
   const router = useRouter();
   const chatRef = ref(database, "chats/doctor-patient-chat");
-  let userId: string;
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
-      userId = wallet.publicKey.toString();
+      setUserId(wallet.publicKey.toString());
     } else {
       setShowConnectWallet(true);
     }
@@ -195,36 +196,45 @@ function Chat() {
 
   useEffect(() => {
     const initKeyPair = async () => {
-      // Check if the keys are already in local storage
       let publicKey = retrieveKey("rsa-public-key");
       let privateKeyBase64 = retrieveKey("rsa-private-key");
-
       let keyPair: CryptoKeyPair;
 
       if (publicKey && privateKeyBase64) {
-        // If keys exist in local storage, import the private key
         const privateKey = await importPrivateKey(privateKeyBase64);
         keyPair = { publicKey: await importPublicKey(publicKey), privateKey };
       } else {
-        // Otherwise, generate and store a new key pair
         keyPair = await generateAndStoreKeyPair();
         publicKey = retrieveKey("rsa-public-key")!;
-        privateKeyBase64 = retrieveKey("rsa-private-key")!;
       }
 
       setChatKeyPair(keyPair);
       setPublicKey(publicKey);
 
-      // Store the public key in Firebase under the user's ID if not already stored
-      if (chatId && !publicKeyStoredInDb) {
+      if (!userId) {
+        console.error("No userId available yet, waiting for wallet...");
+        return;
+      }
+
+      // Check if public key already exists in Firebase
+      const q = query(
+        collection(db, "publicKeys"),
+        where("userId", "==", userId)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        // Only add if it doesn’t exist
         await addDoc(collection(db, "publicKeys"), {
           userId: userId,
           publicKey,
         });
-        setPublicKeyStoredInDb(true);
+        console.log(`Stored public key for userId: ${userId}`);
+      } else {
+        console.log(`Public key already exists for userId: ${userId}`);
       }
+      setPublicKeyStoredInDb(true); // Set this regardless to prevent re-checks
 
-      // Retry fetching the other party's public key
       const fetchOtherPublicKey = async () => {
         const q = query(
           collection(db, "publicKeys"),
@@ -236,16 +246,16 @@ function Chat() {
           const otherUserPublicKey = querySnapshot.docs[0].data().publicKey;
           setOtherPublicKey(otherUserPublicKey);
         } else {
-          console.error("No public key found for the other user, retrying...");
-          setTimeout(fetchOtherPublicKey, 2000); // Retry after 2 seconds
+          console.log("No public key found for chatId, retrying...");
+          setTimeout(fetchOtherPublicKey, 2000);
         }
       };
 
       fetchOtherPublicKey();
     };
 
-    initKeyPair();
-  }, [chatId]);
+    initKeyPair().catch((err) => console.error("initKeyPair failed:", err));
+  }, [chatId, userId]);
 
   const formatTimestamp = (timestamp: number): string => {
     if (typeof timestamp !== "number" || isNaN(timestamp)) {
@@ -267,140 +277,111 @@ function Chat() {
     });
   };
 
-  const storeSentMessageLocally = (
-    message: string,
-    recipientPublicKey: string,
-    timestamp: number
-  ) => {
-    const sentMessages = JSON.parse(
-      localStorage.getItem("sentMessages") || "[]"
-    );
-    sentMessages.push({ message, recipientPublicKey, timestamp });
-    localStorage.setItem("sentMessages", JSON.stringify(sentMessages));
-  };
-
-  const loadSentMessages = (recipientPublicKey: string) => {
-    const sentMessages = JSON.parse(
-      localStorage.getItem("sentMessages") || "[]"
-    );
-    return sentMessages.filter(
-      (msg: any) => msg.recipientPublicKey === recipientPublicKey
-    );
-  };
-
-  useEffect(() => {
-    if (otherPublicKey) {
-      const storedMessages = loadSentMessages(otherPublicKey);
-      setDecryptedMessages((prevMessages) => [
-        ...prevMessages,
-        ...storedMessages.map((msg: any) => ({
-          content: msg.message,
-          sender: publicKey,
-          timestamp: msg.timestamp,
-          formattedTime: formatTimestamp(msg.timestamp),
-        })),
-      ]);
-    }
-  }, [otherPublicKey]);
-
   const handleSend = async () => {
-    if (!otherPublicKey || !message.trim() || !chatKeyPair) return;
+    if (!otherPublicKey || !message.trim() || !chatKeyPair) {
+      console.log("Cannot send: missing data");
+      return;
+    }
 
     try {
-      // Import the other party's public key
       const importedPublicKey = await importPublicKey(otherPublicKey);
-
-      // Encrypt the message using the imported public key
       const encryptedMessage = await encryptMessage(message, importedPublicKey);
-      if (encryptedMessage) {
-        const timestamp = Date.now();
+      const timestamp = Date.now();
 
-        // Push the encrypted message to the database
-        push(chatRef, {
-          sender: publicKey, // Sender's public key
-          recipient: otherPublicKey, // Recipient's public key
-          message: encryptedMessage,
+      const messageRef = push(chatRef, {
+        sender: publicKey,
+        recipient: otherPublicKey,
+        message: encryptedMessage,
+        timestamp,
+      });
+
+      // Add the sent message directly to decryptedMessages in plaintext
+      setDecryptedMessages((prevMessages) => {
+        const newMessage = {
+          key: messageRef.key, // Use Firebase key for uniqueness
+          content: message, // Plaintext for sender
+          sender: publicKey,
+          recipient: otherPublicKey,
           timestamp,
-        });
+          formattedTime: formatTimestamp(timestamp),
+        };
+        return [...prevMessages, newMessage].sort(
+          (a, b) => a.timestamp - b.timestamp
+        );
+      });
 
-        // Store the plaintext message locally
-        storeSentMessageLocally(message, otherPublicKey, timestamp);
-
-        // Directly add the plain text message to the decryptedMessages array
-        setDecryptedMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            content: message, // Add the plain text message
-            sender: publicKey,
-            timestamp,
-            formattedTime: formatTimestamp(timestamp),
-          },
-        ]);
-
-        // Clear the message input
-        setMessage("");
-      }
+      setMessage("");
     } catch (err) {
-      console.error("Failed to encrypt or send message:", err);
+      console.error("Failed to send message:", err);
     }
   };
 
   useEffect(() => {
+    interface Message {
+      key: string;
+      content: string;
+      sender: string;
+      recipient: string;
+      timestamp: number;
+      formattedTime: string;
+    }
+
+    interface FirebaseMessage {
+      recipient: string;
+      sender: string;
+      message: string;
+      timestamp: number;
+    }
+
     const handleNewMessages = async (snapshot: any) => {
-      const messages = snapshot.val();
-      if (messages && chatKeyPair && publicKey) {
-        const newMessages = await Promise.all(
-          Object.entries(messages).map(async ([key, msg]: [string, any]) => {
-            // Filter messages based on recipient
-            if (msg.recipient !== publicKey && msg.sender !== publicKey) {
-              // Skip messages where the current user is neither the sender nor the recipient
-              return null;
-            }
+      const messages: Record<string, FirebaseMessage> | null = snapshot.val();
+      if (!messages || !chatKeyPair || !publicKey) return;
 
-            if (msg.sender === publicKey) {
-              // Skip decryption for messages sent by the current user
-              return null;
-            } else {
-              try {
-                const decryptedContent = await decryptMessage(
-                  msg.message,
-                  chatKeyPair.privateKey
-                );
-                return {
-                  key, // Use the key as a unique identifier
-                  content: decryptedContent,
-                  sender: msg.sender,
-                  timestamp: msg.timestamp,
-                  formattedTime: formatTimestamp(msg.timestamp),
-                };
-              } catch (error) {
-                console.error("Failed to decrypt message:", error);
-                return null;
-              }
-            }
-          })
-        );
-
-        // Filter out null values (messages that are not meant for this user)
-        const filteredNewMessages = newMessages.filter((msg) => msg !== null);
-
-        if (filteredNewMessages.length > 0) {
-          setDecryptedMessages((prevMessages) => {
-            const existingKeys = new Set(prevMessages.map((msg) => msg.key));
-            const uniqueNewMessages = filteredNewMessages.filter(
-              (msg) => !existingKeys.has(msg.key)
-            );
-            return [...prevMessages, ...uniqueNewMessages];
-          });
+      const newMessages = await Promise.all(
+      Object.entries(messages).map(async ([key, msg]: [string, FirebaseMessage]) => {
+        if (msg.recipient !== publicKey && msg.sender !== publicKey) {
+        return null;
         }
+
+        if (msg.sender === publicKey) {
+        // Skip sent messages; they’re already added in handleSend
+        return null;
+        }
+
+        try {
+        const decryptedContent = await decryptMessage(
+          msg.message,
+          chatKeyPair.privateKey
+        );
+        return {
+          key,
+          content: decryptedContent,
+          sender: msg.sender,
+          recipient: msg.recipient,
+          timestamp: msg.timestamp,
+          formattedTime: formatTimestamp(msg.timestamp),
+        } as Message;
+        } catch (error) {
+        console.error("Decryption failed:", error, msg);
+        return null;
+        }
+      })
+      );
+
+      const filteredMessages = newMessages.filter((msg): msg is Message => msg !== null);
+      if (filteredMessages.length > 0) {
+      setDecryptedMessages((prevMessages) => {
+        const allMessages = [...prevMessages, ...filteredMessages];
+        const uniqueMessages = Array.from(
+        new Map(allMessages.map((msg) => [msg.key, msg])).values()
+        );
+        return uniqueMessages.sort((a, b) => a.timestamp - b.timestamp);
+      });
       }
     };
 
     onValue(chatRef, handleNewMessages);
-
-    return () => {
-      off(chatRef, "value", handleNewMessages);
-    };
+    return () => off(chatRef, "value", handleNewMessages);
   }, [chatRef, chatKeyPair, publicKey]);
 
   useEffect(() => {
@@ -447,7 +428,7 @@ function Chat() {
           </Link>
           <div className="flex gap-2">
             <Image
-              src={DocImg}
+              src={doctorDetails?.avatar || DocImg}
               alt="doctor profile image"
               className="w-10 h-10 rounded-full"
             />
@@ -497,7 +478,7 @@ function Chat() {
           </div>
         ))}
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-white py-2 px-4 flex items-center justify-between z-10">
+      <div className="fixed bottom-0 right-0 sm:max-w-lg sm:mx-auto left-0 w-full bg-white py-2 px-4 flex items-center justify-between z-10">
         <Image src={Attachment} alt="select a file" className="mr-0" />
         <input
           type="text"
@@ -516,7 +497,7 @@ function Chat() {
             <Image
               src={SendIcon}
               alt="send message"
-              className="w-6 h-6"
+              className="w-6 h-6 cursor-pointer"
               onClick={handleSend}
             />
           )}

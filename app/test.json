@@ -1,8 +1,0 @@
-{
-  "doctorId": "abc",
-  "patientId": "xyz",
-  "signsAndSymptoms": "fever",
-  "diagnosis": "flu",
-  "prescription": "rest",
-  "timestamp": 1711234567890
-}

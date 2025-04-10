@@ -1,8 +1,8 @@
 {
   "doctorId": "4K297jX1o9XN8zLhohkBEMVEEXVmssBLWNHpuRQuJBiA",
   "patientId": "AXisVZ9Aus6PVdnCNWSD6oHHMM16SF1Vs49aqtRVPvSy",
-  "signsAndSymptoms": "Fever, cough, shortness of breath",
-  "diagnosis": "Pneumonia",
-  "prescription": "Amoxicillin 500mg, Rest, Hydration",
+  "signsAndSymptoms": "Chest pain, shortness of breath, sweating",
+  "diagnosis": "Heart Attack",
+  "prescription": "Aspirin, Emergency Care",
   "timestamp": 1742722046722
 }

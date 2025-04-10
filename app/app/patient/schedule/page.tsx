@@ -36,6 +36,7 @@ interface Booking {
 interface Doctor {
   name: string;
   specialization: string;
+  avatar: string;
   [key: string]: any;
 }
 
@@ -44,6 +45,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  avatar: string;
   [key: string]: any;
 }
 
@@ -143,6 +145,7 @@ function Schedule() {
               doctorData = {
                 name: `Dr. ${userData.firstName} ${userData.lastName}`,
                 specialization: userData.specialization,
+                avatar: userData.avatar,
               };
             }
 
@@ -256,8 +259,8 @@ function Schedule() {
               }
             >
               <div className="flex gap-2">
-                <Image
-                  src={DocImg}
+                <img
+                  src={booking.doctor?.avatar || DocImg}
                   alt="doctor profile image"
                   className="w-10 h-10"
                 />

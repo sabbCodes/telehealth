@@ -26,6 +26,7 @@ import { ref, push, onValue, off } from "firebase/database";
 import PopupWallet from "@/app/components/PopupWallet";
 import { useRouter } from "next/navigation";
 import { uploadFile, downloadFile, listFiles } from "@/app/components/utils/akave-api";
+import AIAssistantPopup from "@/app/components/AIAssistantPopup";
 
 interface PatientDetails {
   firstName: string;
@@ -40,6 +41,11 @@ interface PatientDetails {
   occupation: string;
   marritalStatus: string;
   address: string;
+  avatar: string;
+}
+
+interface DoctorDetails {
+  avatar: string;
 }
 
 interface CryptoKeyPair {
@@ -91,12 +97,16 @@ function Chat() {
   const chatRef = ref(database, "chats/doctor-patient-chat");
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [publicKeyStoredInDb, setPublicKeyStoredInDb] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
   const router = useRouter();
-  let userId: string;
+  const [userId, setUserId] = useState<string | null>(null);
+  const [doctorDetails, setDoctorDetails] = useState<DoctorDetails | null>(
+    null
+  );
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
-      userId = wallet.publicKey.toString();
+      setUserId(wallet.publicKey.toString());
     } else {
       setShowConnectWallet(true);
     }
@@ -235,36 +245,45 @@ function Chat() {
 
   useEffect(() => {
     const initKeyPair = async () => {
-      // Check if the keys are already in local storage
       let publicKey = retrieveKey("rsa-public-key");
       let privateKeyBase64 = retrieveKey("rsa-private-key");
-
       let keyPair: CryptoKeyPair;
 
       if (publicKey && privateKeyBase64) {
-        // If keys exist in local storage, import the private key
         const privateKey = await importPrivateKey(privateKeyBase64);
         keyPair = { publicKey: await importPublicKey(publicKey), privateKey };
       } else {
-        // Otherwise, generate and store a new key pair
         keyPair = await generateAndStoreKeyPair();
         publicKey = retrieveKey("rsa-public-key")!;
-        privateKeyBase64 = retrieveKey("rsa-private-key")!;
       }
 
       setChatKeyPair(keyPair);
       setPublicKey(publicKey);
 
-      // Store the public key in Firebase under the user's ID if not already stored
-      if (chatId && !publicKeyStoredInDb) {
+      if (!userId) {
+        console.error("No userId available yet, waiting for wallet...");
+        return;
+      }
+
+      // Check if public key already exists in Firebase
+      const q = query(
+        collection(db, "publicKeys"),
+        where("userId", "==", userId)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        // Only add if it doesn’t exist
         await addDoc(collection(db, "publicKeys"), {
           userId: userId,
           publicKey,
         });
-        setPublicKeyStoredInDb(true);
+        console.log(`Stored public key for userId: ${userId}`);
+      } else {
+        console.log(`Public key already exists for userId: ${userId}`);
       }
+      setPublicKeyStoredInDb(true); // Set this regardless to prevent re-checks
 
-      // Retry fetching the other party's public key
       const fetchOtherPublicKey = async () => {
         const q = query(
           collection(db, "publicKeys"),
@@ -276,16 +295,16 @@ function Chat() {
           const otherUserPublicKey = querySnapshot.docs[0].data().publicKey;
           setOtherPublicKey(otherUserPublicKey);
         } else {
-          console.error("No public key found for the other user, retrying...");
-          setTimeout(fetchOtherPublicKey, 2000); // Retry after 2 seconds
+          console.log("No public key found for chatId, retrying...");
+          setTimeout(fetchOtherPublicKey, 2000);
         }
       };
 
       fetchOtherPublicKey();
     };
 
-    initKeyPair();
-  }, [chatId]);
+    initKeyPair().catch((err) => console.error("initKeyPair failed:", err));
+  }, [chatId, userId || wallet.connected]);
 
   const formatTimestamp = (timestamp: number): string => {
     if (typeof timestamp !== "number" || isNaN(timestamp)) {
@@ -307,140 +326,115 @@ function Chat() {
     });
   };
 
-  const storeSentMessageLocally = (
-    message: string,
-    recipientPublicKey: string,
-    timestamp: number
-  ) => {
-    const sentMessages = JSON.parse(
-      localStorage.getItem("sentMessages") || "[]"
-    );
-    sentMessages.push({ message, recipientPublicKey, timestamp });
-    localStorage.setItem("sentMessages", JSON.stringify(sentMessages));
-  };
-
-  const loadSentMessages = (recipientPublicKey: string) => {
-    const sentMessages = JSON.parse(
-      localStorage.getItem("sentMessages") || "[]"
-    );
-    return sentMessages.filter(
-      (msg: any) => msg.recipientPublicKey === recipientPublicKey
-    );
-  };
-
-  useEffect(() => {
-    if (otherPublicKey) {
-      const storedMessages = loadSentMessages(otherPublicKey);
-      setDecryptedMessages((prevMessages) => [
-        ...prevMessages,
-        ...storedMessages.map((msg: any) => ({
-          content: msg.message,
-          sender: publicKey,
-          timestamp: msg.timestamp,
-          formattedTime: formatTimestamp(msg.timestamp),
-        })),
-      ]);
-    }
-  }, [otherPublicKey]);
-
   const handleSend = async () => {
-    if (!otherPublicKey || !message.trim() || !chatKeyPair) return;
+    if (!otherPublicKey || !message.trim() || !chatKeyPair) {
+      console.log("Cannot send: missing data");
+      return;
+    }
 
     try {
-      // Import the other party's public key
       const importedPublicKey = await importPublicKey(otherPublicKey);
-
-      // Encrypt the message using the imported public key
       const encryptedMessage = await encryptMessage(message, importedPublicKey);
-      if (encryptedMessage) {
-        const timestamp = Date.now();
+      const timestamp = Date.now();
 
-        // Push the encrypted message to the database
-        push(chatRef, {
-          sender: publicKey, // Sender's public key
-          recipient: otherPublicKey, // Recipient's public key
-          message: encryptedMessage,
+      const messageRef = push(chatRef, {
+        sender: publicKey,
+        recipient: otherPublicKey,
+        message: encryptedMessage,
+        timestamp,
+      });
+
+      // Add the sent message directly to decryptedMessages in plaintext
+      setDecryptedMessages((prevMessages) => {
+        const newMessage = {
+          key: messageRef.key, // Use Firebase key for uniqueness
+          content: message, // Plaintext for sender
+          sender: publicKey,
+          recipient: otherPublicKey,
           timestamp,
-        });
+          formattedTime: formatTimestamp(timestamp),
+        };
+        return [...prevMessages, newMessage].sort(
+          (a, b) => a.timestamp - b.timestamp
+        );
+      });
 
-        // Store the plaintext message locally
-        storeSentMessageLocally(message, otherPublicKey, timestamp);
-
-        // Directly add the plain text message to the decryptedMessages array
-        setDecryptedMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            content: message, // Add the plain text message
-            sender: publicKey,
-            timestamp,
-            formattedTime: formatTimestamp(timestamp),
-          },
-        ]);
-
-        // Clear the message input
-        setMessage("");
-      }
+      setMessage("");
     } catch (err) {
-      console.error("Failed to encrypt or send message:", err);
+      console.error("Failed to send message:", err);
     }
   };
 
   useEffect(() => {
+    interface Message {
+      key: string;
+      content: string;
+      sender: string;
+      recipient: string;
+      timestamp: number;
+      formattedTime: string;
+    }
+
+    interface FirebaseMessage {
+      recipient: string;
+      sender: string;
+      message: string;
+      timestamp: number;
+    }
+
     const handleNewMessages = async (snapshot: any) => {
-      const messages = snapshot.val();
-      if (messages && chatKeyPair && publicKey) {
-        const newMessages = await Promise.all(
-          Object.entries(messages).map(async ([key, msg]: [string, any]) => {
-            // Filter messages based on recipient
+      const messages: Record<string, FirebaseMessage> | null = snapshot.val();
+      if (!messages || !chatKeyPair || !publicKey) return;
+
+      const newMessages = await Promise.all(
+        Object.entries(messages).map(
+          async ([key, msg]: [string, FirebaseMessage]) => {
             if (msg.recipient !== publicKey && msg.sender !== publicKey) {
-              // Skip messages where the current user is neither the sender nor the recipient
               return null;
             }
 
             if (msg.sender === publicKey) {
-              // Skip decryption for messages sent by the current user
+              // Skip sent messages; they’re already added in handleSend
               return null;
-            } else {
-              try {
-                const decryptedContent = await decryptMessage(
-                  msg.message,
-                  chatKeyPair.privateKey
-                );
-                return {
-                  key, // Use the key as a unique identifier
-                  content: decryptedContent,
-                  sender: msg.sender,
-                  timestamp: msg.timestamp,
-                  formattedTime: formatTimestamp(msg.timestamp),
-                };
-              } catch (error) {
-                console.error("Failed to decrypt message:", error);
-                return null;
-              }
             }
-          })
-        );
 
-        // Filter out null values (messages that are not meant for this user)
-        const filteredNewMessages = newMessages.filter((msg) => msg !== null);
+            try {
+              const decryptedContent = await decryptMessage(
+                msg.message,
+                chatKeyPair.privateKey
+              );
+              return {
+                key,
+                content: decryptedContent,
+                sender: msg.sender,
+                recipient: msg.recipient,
+                timestamp: msg.timestamp,
+                formattedTime: formatTimestamp(msg.timestamp),
+              } as Message;
+            } catch (error) {
+              console.error("Decryption failed:", error, msg);
+              return null;
+            }
+          }
+        )
+      );
 
-        if (filteredNewMessages.length > 0) {
-          setDecryptedMessages((prevMessages) => {
-            const existingKeys = new Set(prevMessages.map((msg) => msg.key));
-            const uniqueNewMessages = filteredNewMessages.filter(
-              (msg) => !existingKeys.has(msg.key)
-            );
-            return [...prevMessages, ...uniqueNewMessages];
-          });
-        }
+      const filteredMessages = newMessages.filter(
+        (msg): msg is Message => msg !== null
+      );
+      if (filteredMessages.length > 0) {
+        setDecryptedMessages((prevMessages) => {
+          const allMessages = [...prevMessages, ...filteredMessages];
+          const uniqueMessages = Array.from(
+            new Map(allMessages.map((msg) => [msg.key, msg])).values()
+          );
+          return uniqueMessages.sort((a, b) => a.timestamp - b.timestamp);
+        });
       }
     };
 
     onValue(chatRef, handleNewMessages);
-
-    return () => {
-      off(chatRef, "value", handleNewMessages);
-    };
+    return () => off(chatRef, "value", handleNewMessages);
   }, [chatRef, chatKeyPair, publicKey]);
 
   useEffect(() => {
@@ -607,8 +601,34 @@ function Chat() {
     }
   };
 
+  useEffect(() => {
+      const fetchDoctorDetails = async () => {
+        if (userId) {
+          try {
+            const doctorsRef = collection(db, "users");
+            const q = query(
+              doctorsRef,
+              where("walletAddress", "==", userId as string)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+              const doctorDoc = querySnapshot.docs[0].data() as DoctorDetails;
+              setDoctorDetails(doctorDoc);
+            } else {
+              console.error("doctortDoc not found");
+            }
+          } catch (error) {
+            console.error("Error fetching doctor's details:", error);
+          }
+        }
+      };
+
+      fetchDoctorDetails();
+    }, [chatId]);
+
   return (
-    <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col">
+    <main className="w-11/12 max-w-lg mx-auto font-urbanist min-h-screen flex flex-col relative">
       <div className="flex mt-2 justify-between items-center">
         <div className="flex gap-3 items-center">
           <Link href="/doctor/messages">
@@ -618,8 +638,8 @@ function Chat() {
             className="flex gap-2 cursor-pointer"
             onClick={handleProfileClick}
           >
-            <Image
-              src={DocImg}
+            <img
+              src={patientDetails?.avatar || DocImg}
               alt="doctor profile image"
               className="w-10 h-10 rounded-full"
             />
@@ -700,7 +720,15 @@ function Chat() {
           </div>
         ))}
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-white py-2 px-4 flex items-center justify-between z-10">
+      <button
+        className="absolute right-0 bottom-20 bg-custom-blue text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all z-30"
+        onClick={() => setShowAIAssistant(true)}
+      >
+        <span className="sr-only">Ask AI</span>
+        {/* 🤖 */}
+        🧠
+      </button>
+      <div className="fixed bottom-0 right-0 sm:max-w-lg sm:mx-auto left-0 w-full bg-white py-2 px-4 flex items-center justify-between z-10">
         <Image src={Attachment} alt="select a file" className="mr-0" />
         <input
           type="text"
@@ -720,11 +748,14 @@ function Chat() {
               src={SendIcon}
               onClick={handleSend}
               alt="send message"
-              className="w-6 h-6"
+              className="w-6 h-6 cursor-pointer"
             />
           )}
         </div>
       </div>
+      {showAIAssistant && (
+        <AIAssistantPopup onClose={() => setShowAIAssistant(false)} userAvatar={doctorDetails?.avatar || ""} />
+      )}
       {showConnectWallet && (
         <PopupWallet onClose={() => setShowConnectWallet(false)} />
       )}
