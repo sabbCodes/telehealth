@@ -480,7 +480,7 @@ function Chat() {
       );
 
       // Get CIDs and fetch from Akave
-      const bucketName = "telehealthsol-records";
+      const bucketName = "telehealthsol-records-v2";
       const akaveRecords = await Promise.all(
         filteredRecords.map(async (filteredRecord) => {
           const cid = filteredRecord.account.akaveCid;
@@ -539,7 +539,7 @@ function Chat() {
       };
 
       // Upload to Akave
-      const bucketName = "telehealthsol-records";
+      const bucketName = "telehealthsol-records-v2";
       const fileName = `${patientDetails.walletAddress}-${record.timestamp}.json`;
       const akaveResult = await uploadFile(bucketName, fileName, record);
       const cid = akaveResult.data.RootCID;

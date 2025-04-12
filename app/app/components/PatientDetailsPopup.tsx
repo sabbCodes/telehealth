@@ -19,6 +19,7 @@ interface PatientDetails {
   occupation: string;
   marritalStatus: string;
   address: string;
+  avatar: string;
 }
 
 interface MedicalRecord {
@@ -41,6 +42,7 @@ interface MedicalRecord {
 interface DoctorDetails {
   firstName: string;
   lastName: string;
+  avatar: string;
 }
 
 interface PatientDetailsPopupProps {
@@ -166,8 +168,8 @@ const PatientDetailsPopup: React.FC<PatientDetailsPopupProps> = ({
         {records ? (
           <div className="w-full">
             <div className="flex mb-4 h-16 items-center gap-2">
-              <Image
-                src={DocImg}
+              <img
+                src={patientDetails.avatar || DocImg}
                 alt="patient profile image"
                 className="w-16 h-full rounded-lg"
               />
@@ -185,8 +187,8 @@ const PatientDetailsPopup: React.FC<PatientDetailsPopupProps> = ({
               {records.map((record, index) => (
                 <div key={index}>
                   <div className="flex mb-4 h-16 items-center gap-2">
-                    <Image
-                      src={DocImg}
+                    <img
+                      src={record.doctorDetails?.avatar || DocImg}
                       alt="doctor profile image"
                       className="w-10 h-10 rounded-full"
                     />
@@ -346,8 +348,8 @@ const PatientDetailsPopup: React.FC<PatientDetailsPopupProps> = ({
         ) : (
           <div>
             <div className="flex mt-1 w-full h-20 gap-4 mb-4 items-center">
-              <Image
-                src={DocImg}
+              <img
+                src={patientDetails.avatar || DocImg}
                 alt="patient profile image"
                 className="w-16 h-16 rounded-lg"
               />

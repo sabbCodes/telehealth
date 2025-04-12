@@ -427,7 +427,7 @@ function Chat() {
             <Image src={ArrowLeft} alt="back icon" />
           </Link>
           <div className="flex gap-2">
-            <Image
+            <img
               src={doctorDetails?.avatar || DocImg}
               alt="doctor profile image"
               className="w-10 h-10 rounded-full"
