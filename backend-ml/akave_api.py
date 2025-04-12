@@ -1,7 +1,7 @@
 import requests
 import json
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "https://e898-149-22-84-140.ngrok-free.app"
 
 def listFiles(bucket_name):
     url = f"{API_BASE_URL}/buckets/{bucket_name}/files"
