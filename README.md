@@ -36,6 +36,14 @@ The health storage related files can be found in;
 - app/app/component/PatientDetailsPopup.tsx
 - app/app/component/PredictDiagnosis.tsx
 
+### To test the app
+
+- I recommend signing up as a doctor - as this is where everything goes down
+- Login to dashboard
+- Paste this link to test the Blueprint Hackathon integration https://app.telehealthsol.health/doctor/messages/AXisVZ9Aus6PVdnCNWSD6oHHMM16SF1Vs49aqtRVPvSy to take you to the chat page.
+- To upload and retrieve data, click on patient's profile picture
+- Click on the blue AI button to chat with the model
+
 ### Tools & Languages
 
 Languages/Tools include;
