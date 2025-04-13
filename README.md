@@ -43,6 +43,7 @@ The health storage related files can be found in;
 - Paste this link to test the Blueprint Hackathon integration https://app.telehealthsol.health/doctor/messages/AXisVZ9Aus6PVdnCNWSD6oHHMM16SF1Vs49aqtRVPvSy to take you to the chat page.
 - To upload and retrieve data, click on patient's profile picture
 - Click on the blue AI button to chat with the model
+- Please, try the "update records" function before "get medical records"
 
 ### Tools & Languages
 
