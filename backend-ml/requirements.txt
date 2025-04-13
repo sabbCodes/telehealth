@@ -2,3 +2,4 @@ tensorflow
 flask
 pandas
 scikit-learn
+flask-cors

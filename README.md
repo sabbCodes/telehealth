@@ -20,11 +20,12 @@ We've integrated Filecoin storage using Akave, mainly for;
 - Filecoin's off-chain decentralised nature.
 - Akave's speed and encryption functionality to keep patients' health records confidential.
 
-The way that we integrated them include;
+The way that we integrated them is as follows;
 - Patients' health records - complaints, diagnosis & prescription - are saved on Filecoin, through Akave.
 - The CID, patient's wallet address and doctor's wallet address are then saved on Solana.
 - The saved records are fetched and used to train the AI model.
-- The model is uploaded to Filecoin through AKave as well.
+- The saved records can be fetched and veiwed by doctors to aid in medical diagnosis and decision making.
+- The trained model is uploaded to Filecoin through AKave as well.
 - Model is queried through Akave for help with health diagnoses.
 
 The AI-model related files can be found in the backend-ml directory.
