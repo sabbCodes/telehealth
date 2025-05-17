@@ -253,75 +253,125 @@
 
 
 
-  // const createEntry = useMutation({
-  //   mutationFn: async () => {
-  //     if (!wallet.publicKey || !patientDetails?.walletAddress) {
-  //       setShowConnectWallet(true);
-  //       throw new Error("Missing wallet or patient details.");
-  //     }
-
-  //     const record = web3.Keypair.generate();
-
-  //     await program.methods
-  //       .enterHealthRecord(
-  //         patientDetails.walletAddress,
-  //         signsAndSymptoms,
-  //         diagnosis,
-  //         prescription
-  //       )
-  //       .accounts({
-  //         recordEntry: record.publicKey,
-  //         doctor: wallet.publicKey,
-  //         // systemProgram: web3.SystemProgram.programId,
-  //       })
-  //       .signers([record])
-  //       .rpc();
-  //   },
-  //   onSuccess: (signature) => {
-  //     toast.success("Record updated successfully");
-  //     recordsQuery.refetch();
-  //     setShowPopup(false);
-  //     setSignsAndSymptoms("");
-  //     setDiagnosis("");
-  //     setPrescription("");
-  //     setMessage("");
-  //   },
-  //   onError: (error) => {
-  //     toast.error(`Failed to update record: ${error.message}`);
-  //   },
-  // });
 
 
+import * as anchor from "@coral-xyz/anchor";
+import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js";
+import { assert } from "chai";
+import { TeleHealth } from "../target/types/tele_health"; // Adjust path to your program's IDL
 
-  // const recordsQuery = useQuery({
-  //   queryKey: ["recordDetailsEntry", patientDetails?.walletAddress],
-  //   queryFn: async () => {
-  //     if (!patientDetails) {
-  //       throw new Error("No patient details available");
-  //     }
+describe("TeleHealth", () => {
+  // Configure the client to use the local cluster
+  const provider = AnchorProvider.env();
+  anchor.setProvider(provider);
 
-  //     const patientPublicKey = new PublicKey(patientDetails.walletAddress);
+  const program = anchor.workspace.TeleHealth as Program<TeleHealth>;
+  const doctor = provider.wallet;
 
-  //     const allRecords = await program.account.recordDetailsEntry.all();
+  // Helper function to generate a patient ID (random public key)
+  const generatePatientId = () => new web3.Keypair().publicKey.toBase58();
 
-  //     const filteredRecords = allRecords.filter(
-  //       (record) => record.account.patientId === patientPublicKey.toBase58()
-  //     );
+  // Helper function to derive PDA
+  const getRecordPda = async (patientId: string, doctor: PublicKey) => {
+    return await PublicKey.findProgramAddress(
+      [Buffer.from(patientId), doctor.toBuffer()],
+      program.programId
+    );
+  };
 
-  //     return filteredRecords;
-  //   },
-  //   enabled: !!patientDetails,
-  // });
+  it("Creates a health record successfully", async () => {
+    const patientId = generatePatientId();
+    const akaveCid =
+      "Qm1234567890abcdef1234567890abcdef1234567890abcdef12345678";
 
+    const [recordPda, bump] = await getRecordPda(patientId, doctor.publicKey);
 
-  // const handleUpdateRecords = () => {
-  //   createEntry.mutate();
-  // };
+    await program.methods
+      .enterHealthRecord(patientId, akaveCid)
+      .accounts({
+        recordEntry: recordPda,
+        doctor: doctor.publicKey,
+        systemProgram: web3.SystemProgram.programId,
+      })
+      .rpc();
 
-  // interface MedicalRecord {
-  //   doctorId: string;
-  //   signsAndSymptoms: string;
-  //   diagnosis: string;
-  //   prescription: string;
-  //   timestamp: number;
-  // }
+    // Fetch the account and verify its contents
+    const recordAccount = await program.account.recordDetailsEntry.fetch(
+      recordPda
+    );
+
+    assert.equal(recordAccount.doctor.toBase58(), doctor.publicKey.toBase58());
+    assert.equal(recordAccount.patientId, patientId);
+    assert.equal(recordAccount.akaveCid, akaveCid);
+    assert.isNumber(recordAccount.timestamp);
+  });
+
+  it("Fails if patient_id is too long", async () => {
+    const patientId = "A".repeat(45); // Exceeds 44 chars
+    const akaveCid =
+      "Qm1234567890abcdef1234567890abcdef1234567890abcdef12345678";
+
+    const [recordPda] = await getRecordPda(patientId, doctor.publicKey);
+
+    try {
+      await program.methods
+        .enterHealthRecord(patientId, akaveCid)
+        .accounts({
+          recordEntry: recordPda,
+          doctor: doctor.publicKey,
+          systemProgram: web3.SystemProgram.programId,
+        })
+        .rpc();
+      assert.fail("Should have failed with PatientIdTooLong error");
+    } catch (err) {
+      assert.include(
+        err.toString(),
+        "Patient ID should be a valid Solana public key (max 44 chars)"
+      );
+    }
+  });
+
+  it("Fails if akave_cid is too long", async () => {
+    const patientId = generatePatientId();
+    const akaveCid = "Qm" + "A".repeat(63); // Exceeds 64 chars
+
+    const [recordPda] = await getRecordPda(patientId, doctor.publicKey);
+
+    try {
+      await program.methods
+        .enterHealthRecord(patientId, akaveCid)
+        .accounts({
+          recordEntry: recordPda,
+          doctor: doctor.publicKey,
+          systemProgram: web3.SystemProgram.programId,
+        })
+        .rpc();
+      assert.fail("Should have failed with AkaveCidTooLong error");
+    } catch (err) {
+      assert.include(err.toString(), "Akave CID too long (max 64 chars)");
+    }
+  });
+
+  it("Verifies PDA derivation", async () => {
+    const patientId = generatePatientId();
+    const akaveCid =
+      "Qm1234567890abcdef1234567890abcdef1234567890abcdef12345678";
+
+    const [recordPda, bump] = await getRecordPda(patientId, doctor.publicKey);
+
+    await program.methods
+      .enterHealthRecord(patientId, akaveCid)
+      .accounts({
+        recordEntry: recordPda,
+        doctor: doctor.publicKey,
+        systemProgram: web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    // Ensure the account exists at the derived PDA
+    const accountInfo = await provider.connection.getAccountInfo(recordPda);
+    assert.isNotNull(accountInfo, "Account should exist at the derived PDA");
+    assert.equal(accountInfo.owner.toBase58(), program.programId.toBase58());
+  });
+});

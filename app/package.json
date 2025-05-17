@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@civic/auth-web3": "^0.5.9",
     "@coral-xyz/anchor": "^0.31.0",
     "@firebase/firestore": "^4.7.10",
     "@project-serum/anchor": "^0.26.0",

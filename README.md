@@ -3,24 +3,37 @@
 You've reached the official Repo for [teleHealthSol](app.telehealthsol.health "teleHealthSol")
 
 teleHealthSol is an on-chain telemedicine platform that solves 2 major problems:
+
 - Long waiting time at the hospital/unnecessary hosptital visits.
 - Missing/lost health records.
 
 Solution
+
 - Reduce waiting time efficiently without affecting the quality of healthcare rendered.
 - Keep track of patients' health records using Filecoin.
 - Keep patients' health records confidential, leveraging Akave's encryption functionality.
 
-
 ![App flow](architecture.drawio.svg)
+
+## Civic Auth Integration
+
+We've integrated Civic Auth to ease sign in process for our non crypto-oriented doctors who have complained about not understanding the previous onboarding process.
+
+Below are the specific directories of the integrations;
+
+- app/app/component/ConnectWallet.tsx - here's where sign in takes place using Google
+- app/app/patient/userHome - here we're fetching user details like name & profile picture and creating embedded wallet for new users and displaying their publicKey which serves as their ID on the app
+- app/app/patient/userProfile - here, we're also displaying basic details to users as well as their balance
 
 ## AI Blueprint Hackathon
 
 We've integrated Filecoin storage using Akave, mainly for;
+
 - Filecoin's off-chain decentralised nature.
 - Akave's speed and encryption functionality to keep patients' health records confidential.
 
 The way that we integrated them is as follows;
+
 - Patients' health records - complaints, diagnosis & prescription - are saved on Filecoin, through Akave.
 - The CID, patient's wallet address and doctor's wallet address are then saved on Solana.
 - The saved records are fetched and used to train the AI model.
@@ -30,6 +43,7 @@ The way that we integrated them is as follows;
 
 The AI-model related files can be found in the backend-ml directory.
 The health storage related files can be found in;
+
 - app/app/component/utils/akave-api.js
 - app/app/doctor/messages/chatid/page.tsx
 - app/app/component/AIAssistantPopup.tsx
@@ -40,7 +54,7 @@ The health storage related files can be found in;
 
 - I recommend signing up as a doctor - as this is where everything goes down
 - Login to dashboard
-- Paste this link to test the Blueprint Hackathon integration https://app.telehealthsol.health/doctor/messages/AXisVZ9Aus6PVdnCNWSD6oHHMM16SF1Vs49aqtRVPvSy to take you to the chat page.
+- Paste this link to test the Blueprint Hackathon integration <https://app.telehealthsol.health/doctor/messages/AXisVZ9Aus6PVdnCNWSD6oHHMM16SF1Vs49aqtRVPvSy> to take you to the chat page.
 - To upload and retrieve data, click on patient's profile picture
 - Click on the blue AI button to chat with the model
 - Please, try the "update records" function before "get medical records"
@@ -48,6 +62,7 @@ The health storage related files can be found in;
 ### Tools & Languages
 
 Languages/Tools include;
+
 - Rust
 - Anchor
 - Python
@@ -55,7 +70,7 @@ Languages/Tools include;
 - Solana web3.js
 - Solana Blink
 
-## To run locally:
+## To run locally
 
 ```bash
 git clone https://github.com/sabbCodes/telehealth.git

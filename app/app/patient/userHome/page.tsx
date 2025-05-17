@@ -27,6 +27,9 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import DnaLoader from "@/app/components/DnaLoader";
+import { userHasWallet } from "@civic/auth-web3";
+import { useUser } from "@civic/auth-web3/react";
+import { useWallet } from "@civic/auth-web3/react";
 
 interface UserData {
   firstName: string;
@@ -54,40 +57,33 @@ interface Doctor {
   avatar: string;
 }
 
-// function useQueryParams() {
-//   const [queryParams, setQueryParams] = useState<URLSearchParams | null>(null);
-
-//   useEffect(() => {
-//     setQueryParams(new URLSearchParams(window.location.search));
-//   }, []);
-
-//   return queryParams;
-// }
-
 function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const user = auth.currentUser;
+  // const user = auth.currentUser;
   const router = useRouter();
+  const [userWallet, setUserWallet] = useState<string | null>(null);
+  const { user } = useUser();
+  const { address } = useWallet({ type: "solana" });
 
   const handleDoctorClick = (doctorId: string) => {
     router.push(`/patient/userHome/${doctorId}`);
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (user) {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            setUserData(userDoc.data() as UserData);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+    // const fetchUserData = async () => {
+    //   try {
+    //     if (user) {
+    //       const userDocRef = doc(db, "users", user.uid);
+    //       const userDoc = await getDoc(userDocRef);
+    //       if (userDoc.exists()) {
+    //         setUserData(userDoc.data() as UserData);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching user data:", error);
+    //   }
+    // };
 
     const fetchDoctors = async () => {
       try {
@@ -104,13 +100,30 @@ function Home() {
       }
     };
 
-    fetchUserData();
+    const createUserWallet = async () => {
+      const userContext = await useUser();
+
+      if (!user || userHasWallet(userContext)) return;
+
+      try {
+        if (userContext.user && !userHasWallet(userContext)) {
+          await userContext.createWallet();
+        }
+        console.log("Embedded wallet created successfully");
+      } catch (err) {
+        console.error("Failed to create wallet:", err);
+      }
+    };
+
+    if (address){
+      setUserWallet(address);
+      console.log("User wallet address:", address);
+    }
+
+    createUserWallet();
+    // fetchUserData();
     fetchDoctors();
   }, [user]);
-
-  if (!userData) {
-    return <DnaLoader />;
-  }
 
   const formatWalletAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -122,14 +135,22 @@ function Home() {
         <div className="h-16 w-full flex justify-between items-center">
           <div>
             <h1 className="text-custom-black font-jakarta font-semibold text-2xl">
-              Good day, <span className="capitalize">{userData.firstName}</span>
+              Good day,{" "}
+              {/* <span className="capitalize">{userData?.firstName}</span> */}
+              <span className="capitalize">
+                {user?.name ? user.name.split(" ")[0] : "User"}
+              </span>
             </h1>
             <p className="text-sm text-custom-blue">
-              Patient ID: {formatWalletAddress(userData.walletAddress)}
+              Patient ID:{" "}
+              {/* {userData?.walletAddress
+                ? formatWalletAddress(userData.walletAddress)
+                : "N/A"} */}
+              {userWallet ? formatWalletAddress(userWallet) : "N/A"}
             </p>
           </div>
           <img
-            src={userData.avatar || UserDp}
+            src={user?.picture ? user?.picture : UserDp}
             alt="user profile"
             className="h-16 w-16 shadow-neutral-500 rounded-lg object-cover"
           />

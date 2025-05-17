@@ -11,11 +11,11 @@ pub mod tele_health {
     patient_id: String,
     akave_cid: String,
   ) -> Result<()> {
-    if patient_id.chars().count() > 44 { // Pubkey base58 length
+    if patient_id.chars().count() > 44 {
         return err!(EntryErrors::PatientIdTooLong);
     }
 
-    if akave_cid.chars().count() > 64 { // CIDv1 max length ~59, buffer to 64
+    if akave_cid.chars().count() > 64 {
         return err!(EntryErrors::AkaveCidTooLong);
     }
 
@@ -41,37 +41,28 @@ pub enum EntryErrors {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct RecordDetailsEntry {
   pub doctor: Pubkey,
-  pub patient_id: String,   // Base58 pubkey (e.g., patient’s wallet)
+  #[max_len(44)]
+  pub patient_id: String,
   pub timestamp: i64,
-  pub akave_cid: String,    // CID from Akave upload
+  #[max_len(64)]
+  pub akave_cid: String,
 }
 
 #[derive(Accounts)]
+#[instruction(patient_id: String)]
 pub struct CreateEntry<'info> {
   #[account(
       init,
       payer = doctor,
-      space = RecordDetailsEntry::LEN
+      space = 8 + RecordDetailsEntry::INIT_SPACE,
+      seeds = [patient_id.as_bytes(), doctor.key().as_ref()],
+      bump,
   )]
   pub record_entry: Account<'info, RecordDetailsEntry>,
   #[account(mut)]
   pub doctor: Signer<'info>,
   pub system_program: Program<'info, System>,
-}
-
-const DISCRIMINATOR: usize = 8;
-const PUBKEY_LENGTH: usize = 32;
-const TIMESTAMP_LENGTH: usize = 8;
-const STRING_PREFIX_LENGTH: usize = 4;
-const PATIENT_ID_LENGTH: usize = 44 * 4; // Base58 pubkey, UTF-8 encoded
-const AKAVE_CID_LENGTH: usize = 64 * 4;  // CIDv1, UTF-8 encoded
-
-impl RecordDetailsEntry {
-  const LEN: usize = DISCRIMINATOR +
-    PUBKEY_LENGTH +                    // doctor
-    STRING_PREFIX_LENGTH + PATIENT_ID_LENGTH + // patient_id
-    TIMESTAMP_LENGTH +                 // timestamp
-    STRING_PREFIX_LENGTH + AKAVE_CID_LENGTH;  // akave_cid
 }

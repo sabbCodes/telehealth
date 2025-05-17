@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import AuthObserver from "./AuthObserver";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CivicAuthProvider } from "@civic/auth-web3/nextjs";
 
 export const metadata: Metadata = {
   title: "teleHealthSol",
@@ -47,7 +48,7 @@ export default function RootLayout({
           <AppWalletProvider>
             <AuthProvider>
               <AuthObserver />
-              {children}
+              <CivicAuthProvider>{children}</CivicAuthProvider>
               <ToastContainer />
             </AuthProvider>
           </AppWalletProvider>
