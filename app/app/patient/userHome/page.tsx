@@ -58,32 +58,32 @@ interface Doctor {
 }
 
 function Home() {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  // const [userData, setUserData] = useState<UserData | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const user = auth.currentUser;
+  // const user = auth.currentUser;
   const router = useRouter();
   const [userWallet, setUserWallet] = useState<string | null>(null);
-  // const { user } = useUser();
-  // const { address } = useWallet({ type: "solana" });
+  const { user } = useUser();
+  const { address } = useWallet({ type: "solana" });
 
   const handleDoctorClick = (doctorId: string) => {
     router.push(`/patient/userHome/${doctorId}`);
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (user) {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            setUserData(userDoc.data() as UserData);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+    // const fetchUserData = async () => {
+    //   try {
+    //     if (user) {
+    //       const userDocRef = doc(db, "users", user.uid);
+    //       const userDoc = await getDoc(userDocRef);
+    //       if (userDoc.exists()) {
+    //         setUserData(userDoc.data() as UserData);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching user data:", error);
+    //   }
+    // };
 
     const fetchDoctors = async () => {
       try {
@@ -100,28 +100,28 @@ function Home() {
       }
     };
 
-    // const createUserWallet = async () => {
-    //   const userContext = await useUser();
+    const createUserWallet = async () => {
+      const userContext = await useUser();
 
-    //   if (!user || userHasWallet(userContext)) return;
+      if (!user || userHasWallet(userContext)) return;
 
-    //   try {
-    //     if (userContext.user && !userHasWallet(userContext)) {
-    //       await userContext.createWallet();
-    //     }
-    //     console.log("Embedded wallet created successfully");
-    //   } catch (err) {
-    //     console.error("Failed to create wallet:", err);
-    //   }
-    // };
+      try {
+        if (userContext.user && !userHasWallet(userContext)) {
+          await userContext.createWallet();
+        }
+        console.log("Embedded wallet created successfully");
+      } catch (err) {
+        console.error("Failed to create wallet:", err);
+      }
+    };
 
-    // if (address){
-    //   setUserWallet(address);
-    //   console.log("User wallet address:", address);
-    // }
+    if (address){
+      setUserWallet(address);
+      console.log("User wallet address:", address);
+    }
 
-    // createUserWallet();
-    fetchUserData();
+    createUserWallet();
+    // fetchUserData();
     fetchDoctors();
   }, [user]);
 
@@ -136,22 +136,22 @@ function Home() {
           <div>
             <h1 className="text-custom-black font-jakarta font-semibold text-2xl">
               Good day,{" "}
-              <span className="capitalize">{userData?.firstName}</span>
-              {/* <span className="capitalize">
+              {/* <span className="capitalize">{userData?.firstName}</span> */}
+              <span className="capitalize">
                 {user?.name ? user.name.split(" ")[0] : "User"}
-              </span> */}
+              </span>
             </h1>
             <p className="text-sm text-custom-blue">
               Patient ID:{" "}
-              {userData?.walletAddress
+              {/* {userData?.walletAddress
                 ? formatWalletAddress(userData.walletAddress)
-                : "N/A"}
-              {/* {userWallet ? formatWalletAddress(userWallet) : "N/A"} */}
+                : "N/A"} */}
+              {userWallet ? formatWalletAddress(userWallet) : "N/A"}
             </p>
           </div>
           <img
-            // src={user?.picture ? user?.picture : UserDp}
-            src={userData?.avatar ? userData.avatar : UserDp}
+            src={user?.picture ? user?.picture : UserDp}
+            // src={userData?.avatar ? userData.avatar : UserDp}
             alt="user profile"
             className="h-16 w-16 shadow-neutral-500 rounded-lg object-cover"
           />

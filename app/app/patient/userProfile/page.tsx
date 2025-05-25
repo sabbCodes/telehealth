@@ -25,7 +25,6 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: "",
-    lastName: "",
     dateOfBirth: "",
     gender: "",
     phoneNumber: "",
@@ -33,83 +32,83 @@ function Profile() {
     walletAddress: "",
     avatar: "",
   });
-  // const [userWallet, setUserWallet] = useState<string | null>(null);
-  // const { user } = useUser();
-  // const { address } = useWallet({ type: "solana" });
+  const [userWallet, setUserWallet] = useState<string | null>(null);
+  const { user } = useUser();
+  const { address } = useWallet({ type: "solana" });
 
-  // const useConnection = () => {
-  //   const [connection, setConnection] = useState<Connection | null>(null);
+  const useConnection = () => {
+    const [connection, setConnection] = useState<Connection | null>(null);
 
-  //   useEffect(() => {
-  //     const con = new Connection(clusterApiUrl("devnet"));
-  //     setConnection(con);
-  //   }, []);
+    useEffect(() => {
+      const con = new Connection(clusterApiUrl("devnet"));
+      setConnection(con);
+    }, []);
 
-  //   return { connection };
-  // };
+    return { connection };
+  };
 
-  // const useBalance = () => {
-  //   const [balance, setBalance] = useState<number>();
-  //   // The Solana Wallet Adapter hooks
-  //   const { connection } = useConnection();
-  //   const { address } = useWallet({ type: "solana" });
+  const useBalance = () => {
+    const [balance, setBalance] = useState<number>();
+    // The Solana Wallet Adapter hooks
+    const { connection } = useConnection();
+    const { address } = useWallet({ type: "solana" });
 
-  //   const publicKey = address ? new PublicKey(address) : null;
+    const publicKey = address ? new PublicKey(address) : null;
 
-  //   if (connection && publicKey) {
-  //     connection.getBalance(publicKey).then(setBalance);
-  //   }
+    if (connection && publicKey) {
+      connection.getBalance(publicKey).then(setBalance);
+    }
 
-  //   return balance;
-  // };
+    return balance;
+  };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setFormData({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            dateOfBirth: data.dateOfBirth || "",
-            gender: data.gender || "",
-            phoneNumber: data.phoneNumber || "",
-            email: data.email || "",
-            walletAddress: data.walletAddress || "",
-            avatar: data.avatar || "",
-          });
-        }
-        setLoading(false);
-      } else {
-        router.push("/login");
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  //     if (user) {
+  //       const docRef = doc(db, "users", user.uid);
+  //       const docSnap = await getDoc(docRef);
+  //       if (docSnap.exists()) {
+  //         const data = docSnap.data();
+  //         setFormData({
+  //           firstName: data.firstName || "",
+  //           lastName: data.lastName || "",
+  //           dateOfBirth: data.dateOfBirth || "",
+  //           gender: data.gender || "",
+  //           phoneNumber: data.phoneNumber || "",
+  //           email: data.email || "",
+  //           walletAddress: data.walletAddress || "",
+  //           avatar: data.avatar || "",
+  //         });
+  //       }
+  //       setLoading(false);
+  //     } else {
+  //       router.push("/login");
+  //     }
+  //   });
 
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
 
   // Initialize formData with Civic user data
-  // useEffect(() => {
-  //   if (!user) {
-  //     router.push("/");
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!user) {
+      router.push("/");
+      return;
+    }
 
-  //   setUserWallet(address || null);
+    setUserWallet(address || null);
 
-  //   setFormData({
-  //     firstName: user?.name || "",
-  //     dateOfBirth: "1989-09-30",
-  //     gender: "",
-  //     phoneNumber: user.id,
-  //     email: user.email || "",
-  //     walletAddress: userWallet || "",
-  //     avatar: user.picture || UserDp.src,
-  //   });
-  //   setLoading(false);
-  // }, [user]);
+    setFormData({
+      firstName: user?.name || "",
+      dateOfBirth: "1989-09-30",
+      gender: "",
+      phoneNumber: user.id,
+      email: user.email || "",
+      walletAddress: userWallet || "",
+      avatar: user.picture || UserDp.src,
+    });
+    setLoading(false);
+  }, [user]);
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -145,7 +144,7 @@ function Profile() {
     toast.success("Wallet address copied!");
   };
 
-  // const balance = useBalance();
+  const balance = useBalance();
 
   if (loading) return <DnaLoader />;
 
@@ -178,10 +177,9 @@ function Profile() {
           <p className="text-sm font-medium">
             Balance:{" "}
             <strong>
-              {/* {balance !== null && balance !== undefined
+              {balance !== null && balance !== undefined
                 ? `${balance / 1e9} SOL`
-                : "Loading..."} */}
-              0 Sol
+                : "Loading..."}
             </strong>
           </p>
           {editMode ? (
