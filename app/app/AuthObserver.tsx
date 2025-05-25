@@ -11,7 +11,7 @@ const AuthObserver = () => {
     useEffect(() => {
         if (!loading) {
             if (!user) {
-                router.push("/login");
+                router.push("/");
             }
         }
     }, [user, loading, router]);
