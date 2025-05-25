@@ -48,7 +48,8 @@ export default function RootLayout({
           <AppWalletProvider>
             <AuthProvider>
               <AuthObserver />
-              <CivicAuthProvider>{children}</CivicAuthProvider>
+              {children}
+              {/* <CivicAuthProvider></CivicAuthProvider> */}
               <ToastContainer />
             </AuthProvider>
           </AppWalletProvider>

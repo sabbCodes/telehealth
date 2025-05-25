@@ -13,6 +13,7 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useWallet } from "@solana/wallet-adapter-react";
+import PopupWallet from "@/app/components/PopupWallet";
 
 interface FormData {
   firstName: string;
@@ -31,6 +32,7 @@ interface FormData {
 }
 
 function PatientSignUp() {
+  const [showPopup, setShowPopup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
@@ -110,12 +112,25 @@ function PatientSignUp() {
       !formData.email ||
       !formData.password ||
       !formData.firstName ||
-      !formData.lastName
+      !formData.lastName ||
+      !formData.phoneNumber ||
+      !formData.address ||
+      !formData.dateOfBirth ||
+      !formData.allergies ||
+      !formData.medicalHistory ||
+      !formData.gender ||
+      !formData.nextOfKinName ||
+      !formData.nextOfKinPhone
     ) {
       toast.error("All fields are required.");
       return false;
     }
     // Additional validations here...
+    if (!formData.walletAddress) {
+      toast.error("Please connect your wallet.");
+      setShowPopup(true);
+      return false;
+    }
     return true;
   };
 
@@ -404,6 +419,7 @@ function PatientSignUp() {
           </Link>
         )}
       </div>
+      {showPopup && (<PopupWallet onClose={() => setShowPopup(false)} />)}
       <ToastContainer />
     </main>
   );
